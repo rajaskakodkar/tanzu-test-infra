@@ -1,4 +1,4 @@
-# Plugin configuration
+# Plugin configuration.
 ---
 triggers:
 - repos:
@@ -95,6 +95,7 @@ plugins:
     - welcome
     - wip
     - yuks
+ 
 
   rajaskakodkar/tanzu-test-infra:
     plugins:
