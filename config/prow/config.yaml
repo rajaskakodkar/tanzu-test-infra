@@ -1,6 +1,6 @@
 plank:
   job_url_prefix_config:
-    '*': https://prow.rajaskakodkar.dev/view/
+    '*': https://prow.tanzu.io/view/
   pod_pending_timeout: 15m
   pod_unscheduled_timeout: 5m
   default_decoration_configs:
@@ -102,7 +102,7 @@ tide:
     - needs-rebase
 
   pr_status_base_urls:
-    '*': https://prow.rajaskakodkar.dev/pr
+    '*': https://prow.tanzu.io/pr
   blocker_label: tide/merge-blocker
   squash_label: tide/merge-method-squash
   rebase_label: tide/merge-method-rebase
