@@ -152,3 +152,8 @@ periodics:
       - chmod +x test/docker/run-tce-docker-managed-cluster.sh && ./test/docker/run-tce-docker-managed-cluster.sh
       securityContext:
         privileged: true
+    dnsPolicy: "None"
+    dnsConfig:
+      nameservers:
+        - 1.1.1.1
+        - 1.0.0.1
