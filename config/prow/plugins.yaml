@@ -2,11 +2,11 @@
 ---
 triggers:
 - repos:
-  - rajaskakodkar/prow-on-tce
+  - rajaskakodkar/tanzu-test-infra
 
 approve:
 - repos:
-  - rajaskakodkar/prow-on-tce
+  - rajaskakodkar/tanzu-test-infra
   require_self_approval: false
 
 help:
@@ -27,7 +27,7 @@ size:
 
 lgtm:
 - repos:
-  - rajaskakodkar/prow-on-tce
+  - rajaskakodkar/tanzu-test-infra
   review_acts_as_lgtm: true
 
 cat:
@@ -43,11 +43,11 @@ heart:
 
 config_updater:
   maps:
-    test-infra/config/prow/config.yaml:
+    config/prow/config.yaml:
       name: config
-    test-infra/config/prow/plugins.yaml:
+    config/prow/plugins.yaml:
       name: plugins
-    test-infra/config/jobs/**/*.yaml:
+    config/jobs/**/*.yaml:
       name: job-config
       gzip: true
     experiment/test-configmap.txt:
@@ -56,7 +56,7 @@ config_updater:
 
 welcome:
 - repos:
-  - prow-on-tce
+  - tanzu-test-infra
   message_template: "Welcome @{{.AuthorLogin}}! <br><br>It looks like this is your first PR to <a href='https://github.com/{{.Org}}/{{.Repo}}'>{{.Org}}/{{.Repo}}</a> 🎉. You will be prompted by a bot to use commands during the review process. Do not be afraid to follow the prompts! It is okay to experiment."
 
 retitle:
@@ -96,6 +96,6 @@ plugins:
     - wip
     - yuks
 
-  rajaskakodkar/prow-on-tce:
+  rajaskakodkar/tanzu-test-infra:
     plugins:
     - config-updater
