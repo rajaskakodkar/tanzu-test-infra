@@ -1,6 +1,6 @@
 presubmits:
   rajaskakodkar/tanzu-test-infra:
-  - name: pull-test-infra-prow-checkconfig
+  - name: pull-tanzu-test-infra-prow-checkconfig
     decorate: true
     run_if_changed: '^(config/prow/(config|plugins).yaml$|config/jobs/.*.yaml$)'
     spec:
