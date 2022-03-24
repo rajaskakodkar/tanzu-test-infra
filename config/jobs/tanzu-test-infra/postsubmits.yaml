@@ -1,5 +1,5 @@
 postsubmits:
-  rajaskakodkar/prow-on-tce:
+  rajaskakodkar/tanzu-test-infra:
   - name: push-image-builder
     cluster: test-jobs
     decorate: true
