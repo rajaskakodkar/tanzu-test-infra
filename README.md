@@ -1,1 +1,1 @@
-# test-infra
+# tanzu-test-infra
