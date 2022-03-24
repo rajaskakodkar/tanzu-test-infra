@@ -23,62 +23,11 @@ periodics:
       securityContext:
         privileged: true
 
-- name: periodics-tce-krte
-  cluster: test-jobs
-  interval: 24h
-  #cron: 0/15 * * * * 
-  labels:
-    preset-aws-credential: "true"
-    preset-dind-enabled: "true"
-    preset-kind-volume-mounts: "true"
-  decorate: true
-  decoration_config:
-    timeout: 200m
-  extra_refs:
-  - org: Priyankasaggu11929
-    repo: community-edition
-    base_ref: main
-    path_alias: "https://github.com/Priyankasaggu11929/community-edition"
-  spec:
-    containers:
-    - image: gcr.io/k8s-staging-test-infra/krte:v20220316-9d252673a0-master
-      command:
-        - wrapper.sh
-        - bash
-        - -c
-        - chmod +x scripts/tce-on-aws-deploy.sh && ./scripts/tce-on-aws-deploy.sh
-      env:
-        - name: BOSKOS_HOST
-          value: "boskos.test-pods.svc.cluster.local"
-        - name: AWS_ACCESS_KEY_ID
-          valueFrom:
-            secretKeyRef:
-              name: aws-access-key-id
-              key: aws-access-key-id
-        - name: AWS_ACCESS_KEY_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: aws-access-key-secret
-              key: aws-access-key-secret
-        - name: AWS_B64ENCODED_CREDENTIAL
-          valueFrom:
-            secretKeyRef:
-              name: aws-b64encoded-credential
-              key: aws-b64encoded-credential
-        - name: AWS_SSH_KEY_NAME
-          valueFrom:
-            secretKeyRef:
-              name: aws-ssh-key-name
-              key: aws-ssh-key-name
-      # we need privileged mode in order to do docker in docker
-      securityContext:
-        privileged: true
-
 - name: periodic-test-tce-job-aws
   cluster: test-jobs
   decorate: true
-  interval: 24h
-  #cron: 0 */3 * * * 
+  #interval: 24h
+  # cron: 0/2 * * * *  
   extra_refs:
   - org: rajaskakodkar
     repo: tanzu-test-infra
@@ -91,6 +40,11 @@ periodics:
     preset-kind-volume-mounts: "true"
     preset-dind-enabled: "true"
   spec:
+    dnsPolicy: "None"
+    dnsConfig:
+      nameservers:
+        - 1.1.1.1
+        - 1.0.0.1
     containers:
     - image: public.ecr.aws/t0q8k6g2/vagator/test-image:v20221703-3ba9563
       command:
