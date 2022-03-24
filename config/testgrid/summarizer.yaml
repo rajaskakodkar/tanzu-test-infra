@@ -1,0 +1,38 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: testgrid-summarizer
+  namespace: vagator-testgrid
+  labels:
+    component: summarizer
+    app: testgrid
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: testgrid
+      component: summarizer
+  template:
+    metadata:
+      labels:
+        component: summarizer
+        app: testgrid
+    spec:
+      containers:
+      - name: summarizer
+        image: gcr.io/k8s-testgrid/summarizer:v20220112-v0.0.116-4-g8bf7236
+        args:
+        - --config=gs://vagator-testgrid/config
+        - --gcp-service-account=/etc/testgrid-gcs-credentials/service-account.json
+        - --confirm
+        - --json-logs
+        - --wait=5m
+        volumeMounts:
+        - name: testgrid-gcs-credentials
+          mountPath: /etc/testgrid-gcs-credentials
+          readOnly: true
+      volumes:
+      - name: testgrid-gcs-credentials
+        secret:
+          secretName: testgrid-gcs-credentials

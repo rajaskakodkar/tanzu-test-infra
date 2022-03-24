@@ -1,0 +1,6 @@
+resources:
+  - names:
+    - test-boskos-aws-account
+    state: free
+    type: aws-account
+

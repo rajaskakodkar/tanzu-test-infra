@@ -1,0 +1,41 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: testgrid-updater
+  namespace: vagator-testgrid
+  labels:
+    component: updater
+    app: testgrid
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: testgrid
+      component: updater
+  template:
+    metadata:
+      labels:
+        component: updater
+        app: testgrid
+    spec:
+      containers:
+      - name: updater
+        image: gcr.io/k8s-testgrid/updater:v20220112-v0.0.116-4-g8bf7236
+        args:
+        - --build-timeout=10m
+        - --gcp-service-account=/etc/testgrid-gcs-credentials/service-account.json
+        - --config=gs://vagator-testgrid/config
+        - --confirm
+        - --group-timeout=20m
+        - --json-logs
+        - --wait=1h
+        volumeMounts:
+        - name: testgrid-gcs-credentials
+          mountPath: /etc/testgrid-gcs-credentials
+          readOnly: true
+      volumes:
+      - name: testgrid-gcs-credentials
+        secret:
+          defaultMode: 420
+          secretName: testgrid-gcs-credentials
