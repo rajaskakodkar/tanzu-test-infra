@@ -1,5 +1,5 @@
 postsubmits:
-  rajaskakodkar/prow-on-tce:
+  rajaskakodkar/tanzu-test-infra:
   - name: build-test-image
     decorate: true
     run_if_changed: "images/test/.*"
@@ -35,8 +35,8 @@ periodics:
   decorate: true
   interval: 24h
   extra_refs:
-  - org: vagator
-    repo: test-infra
+  - org: rajaskakodkar
+    repo: prow-test-infra
     base_ref: main
   annotations:
     testgrid-dashboards: build-images
