@@ -3,8 +3,8 @@ periodics:
   decorate: true
   interval: 24h
   extra_refs:
-  - org: vagator
-    repo: test-infra
+  - org: rajaskakodkar
+    repo: tanzu-test-infra
     base_ref: main
   annotations:
     testgrid-dashboards: tce
@@ -80,8 +80,8 @@ periodics:
   interval: 24h
   #cron: 0 */3 * * * 
   extra_refs:
-  - org: vagator
-    repo: test-infra
+  - org: rajaskakodkar
+    repo: tanzu-test-infra
     base_ref: main
   annotations:
     testgrid-dashboards: tce
@@ -131,8 +131,8 @@ periodics:
   interval: 24h
   #cron: 0/15 * * * * 
   extra_refs:
-  - org: vagator
-    repo: test-infra
+  - org: rajaskakodkar
+    repo: tanzu-test-infra
     base_ref: main
   annotations:
     testgrid-dashboards: tce
