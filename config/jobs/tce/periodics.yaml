@@ -40,11 +40,6 @@ periodics:
     preset-kind-volume-mounts: "true"
     preset-dind-enabled: "true"
   spec:
-    dnsPolicy: "None"
-    dnsConfig:
-      nameservers:
-        - 1.1.1.1
-        - 1.0.0.1
     containers:
     - image: public.ecr.aws/t0q8k6g2/vagator/test-image:v20221003-6f693ab
       command:
