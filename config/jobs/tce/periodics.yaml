@@ -76,8 +76,9 @@ periodics:
     dnsPolicy: "None"
     dnsConfig:
       nameservers:
+        - kube-dns.kube-system.svc.cluster.local
         - 1.1.1.1
-        - 1.0.0.1         
+        - 1.0.0.1
 #         - test-pods.svc.cluster.local
 #         - svc.cluster.local
 #         - cluster.local
