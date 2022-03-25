@@ -76,6 +76,7 @@ periodics:
     dnsPolicy: "None"
     dnsConfig:
       nameservers:
+        - us-east-2.compute.internal
         - test-pods.svc.cluster.local
         - svc.cluster.local
         - cluster.local
