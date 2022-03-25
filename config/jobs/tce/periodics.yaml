@@ -26,8 +26,8 @@ periodics:
 - name: periodic-test-tce-job-aws
   cluster: test-jobs
   decorate: true
-  #interval: 24h
-  cron: 0/5 * * * *  
+  interval: 24h
+  #cron: 0/5 * * * *  
   extra_refs:
   - org: rajaskakodkar
     repo: tanzu-test-infra
@@ -74,11 +74,11 @@ periodics:
       securityContext:
         privileged: true
         dnsPolicy: "None"
-    dnsConfig:
-      nameservers:
-        - 8.8.8.8
-        - 1.1.1.1
-        - 1.0.0.1    
+#     dnsConfig:
+#       nameservers:
+#         - 8.8.8.8
+#         - 1.1.1.1
+#         - 1.0.0.1    
 
 - name: periodic-test-tce-capd
   cluster: test-jobs
