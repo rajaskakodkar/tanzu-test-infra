@@ -82,8 +82,8 @@ periodics:
 - name: periodic-test-tce
   cluster: test-jobs
   decorate: true
-  interval:  24h
-  # cron: 0/2 * * * * 
+  # interval:  24h
+  cron: 0/15 * * * * 
   extra_refs:
   - org: rajaskakodkar
     repo: tanzu-test-infra
