@@ -46,7 +46,7 @@ periodics:
         - 1.1.1.1
         - 1.0.0.1
     containers:
-    - image: public.ecr.aws/t0q8k6g2/vagator/test-image:v20221703-3ba9563
+    - image: public.ecr.aws/t0q8k6g2/vagator/test-image:v20221003-6f693ab
       command:
       - /usr/local/bin/run.sh
       args:
