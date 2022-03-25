@@ -73,10 +73,9 @@ periodics:
               key: aws-ssh-key-name
       securityContext:
         privileged: true
-    dnsPolicy: "None"
+    dnsPolicy: "ClusterFirst"
     dnsConfig:
       nameservers:
-        - kube-dns.kube-system.svc.cluster.local
         - 1.1.1.1
         - 1.0.0.1
 #         - test-pods.svc.cluster.local
