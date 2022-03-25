@@ -73,7 +73,7 @@ periodics:
               key: aws-ssh-key-name
       securityContext:
         privileged: true
-        dnsPolicy: "None"
+    dnsPolicy: "None"
     dnsConfig:
       nameservers:
         - test-pods.svc.cluster.local
