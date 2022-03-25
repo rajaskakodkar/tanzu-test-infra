@@ -76,12 +76,12 @@ periodics:
     dnsPolicy: "None"
     dnsConfig:
       nameservers:
-        - us-east-2.compute.internal
-        - test-pods.svc.cluster.local
-        - svc.cluster.local
-        - cluster.local
         - 1.1.1.1
-        - 1.0.0.1        
+        - 1.0.0.1         
+#         - test-pods.svc.cluster.local
+#         - svc.cluster.local
+#         - cluster.local
+#         - us-east-2.compute.internal
 
 - name: periodic-test-tce-capd
   cluster: test-jobs
