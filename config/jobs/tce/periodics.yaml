@@ -73,6 +73,12 @@ periodics:
               key: aws-ssh-key-name
       securityContext:
         privileged: true
+        dnsPolicy: "None"
+    dnsConfig:
+      nameservers:
+        - 8.8.8.8
+        - 1.1.1.1
+        - 1.0.0.1    
 
 - name: periodic-test-tce-capd
   cluster: test-jobs
