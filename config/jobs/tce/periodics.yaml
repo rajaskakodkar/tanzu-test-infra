@@ -83,8 +83,8 @@ periodics:
 - name: periodic-test-tce-capd
   cluster: test-jobs
   decorate: true
-  #interval:  24h
-  cron: 0/15 * * * * 
+  interval:  24h
+  #cron: 0/15 * * * * 
   extra_refs:
   - org: rajaskakodkar
     repo: tanzu-test-infra
