@@ -10,9 +10,9 @@ command="${@:3}"
 
 git clone "https://github.com/${github_org}/${github_repo}"
 cd "${github_repo}"
-#eval "${command}" || {cleanup_dind; exit 1}
+eval "${command}"
 
-if [[ eval "${command}" ]]; then
+if [ $? -eq 0 ]; then
     cleanup_dind
     exit 0
 else
