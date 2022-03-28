@@ -12,5 +12,5 @@ git clone "https://github.com/${github_org}/${github_repo}"
 cd "${github_repo}"
 eval "${command}"
 
-cleanup_dind
+cleanup_dind || true
 
