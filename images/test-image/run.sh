@@ -10,13 +10,4 @@ command="${@:3}"
 
 git clone "https://github.com/${github_org}/${github_repo}"
 cd "${github_repo}"
-eval "${command}"
-
-if [ $? -eq 0 ]; then
-    cleanup_dind
-    exit 0
-else
-    echo "Job failed...."
-    cleanup_dind
-    exit 1
-fi
+eval "${command}" || { cleanup_dind ; exit 1; }
