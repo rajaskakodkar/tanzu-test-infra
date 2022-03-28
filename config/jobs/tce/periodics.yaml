@@ -137,6 +137,6 @@ periodics:
       args:
       - vmware-tanzu
       - community-edition
-      - docker pull hello-world
+      - docker pull hello-worldd
       securityContext:
         privileged: true
