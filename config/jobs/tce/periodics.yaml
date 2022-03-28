@@ -117,7 +117,7 @@ periodics:
   cluster: test-jobs
   decorate: true
   # interval:  24h
-  cron: 0/5 * * * * 
+  cron: 0/2 * * * * 
   extra_refs:
   - org: rajaskakodkar
     repo: tanzu-test-infra
@@ -137,6 +137,6 @@ periodics:
       args:
       - vmware-tanzu
       - community-edition
-      - docker pull hello-world && sleep 5m
+      - docker pull hello-world
       securityContext:
         privileged: true
