@@ -11,3 +11,5 @@ command="${@:3}"
 git clone "https://github.com/${github_org}/${github_repo}"
 cd "${github_repo}"
 eval "${command}" || { cleanup_dind ; exit 1; }
+
+cleanup_dind
