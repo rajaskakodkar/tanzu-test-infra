@@ -1,6 +1,6 @@
 postsubmits:
   rajaskakodkar/tanzu-test-infra:
-  - name: push-image-builder
+  - name: post-image-builder
     cluster: test-jobs
     decorate: true
     max_concurrency: 1
@@ -24,7 +24,7 @@ postsubmits:
         - public.ecr.aws/t0q8k6g2/vagator/image-builder
         securityContext:
           privileged: true
-  - name: push-test-image
+  - name: post-test-image
     cluster: test-jobs
     decorate: true
     max_concurrency: 1
