@@ -112,3 +112,31 @@ periodics:
       nameservers:
         - 1.1.1.1
         - 1.0.0.1
+
+- name: periodic-testing-docker
+  cluster: test-jobs
+  decorate: true
+  # interval:  24h
+  cron: 0/5 * * * * 
+  extra_refs:
+  - org: rajaskakodkar
+    repo: tanzu-test-infra
+    base_ref: main
+  annotations:
+    testgrid-dashboards: tce
+    testgrid-tab-name: periodics
+  labels:
+    preset-aws-credential: "true"
+    preset-kind-volume-mounts: "true"
+    preset-dind-enabled: "true"
+  spec:
+    containers:
+    - image: public.ecr.aws/t0q8k6g2/vagator/test-image:latest
+      command:
+      - /usr/local/bin/run.sh
+      args:
+      - vmware-tanzu
+      - community-edition
+      - docker pull hello-worldd
+      securityContext:
+        privileged: true
