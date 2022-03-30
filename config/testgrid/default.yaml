@@ -12,9 +12,9 @@ default_test_group:
   num_passes_to_disable_alert: 1 # Consider a failing test passing if it has 1 or more consecutive passes
 default_dashboard_tab:
   open_test_template:            # The URL template to visit after clicking on a cell
-    url: https://prow.rajaskakodkar.dev/view/gcs/<gcs_prefix>/<changelist>
+    url: https://prow.tanzu.io/view/s3/<gcs_prefix>/<changelist>
   file_bug_template:             # The URL template to visit when filing a bug
-    url: https://github.com/rajaskakodkar/prow-on-tce/issues/new
+    url: https://github.com/rajaskakodkar/tanzu-test-infra/issues/new
     options:
     - key: title
       value: "Test \"<test-name>\" failed"
@@ -26,11 +26,12 @@ default_dashboard_tab:
   # Text to show in the about menu as a link to another view of the results
   results_text: See these results on Prow
   results_url_template:          # The URL template to visit after clicking
-    url: https://prow.rajaskakodkar.dev/job-history/<gcs_prefix>
+    url: https://prow.tanzu.io/job-history/s3/<gcs_prefix>
   # URL for regression search links.
-  code_search_path: github.com/rajaskakodkar/prow-on-tce/search
+  code_search_path: github.com/rajaskakodkar/tanzu-test-infra/search
   num_columns_recent: 10
   code_search_url_template:      # The URL template to visit when searching for changelists
-    url: https://github.com/rajaskakodkar/prow-on-tce/compare/<start-custom-0>...<end-custom-0>
+    url: https://github.com/rajaskakodkar/tanzu-test-infra/compare/<start-custom-0>...<end-custom-0>
   num_failures_to_alert: 0
   num_passes_to_disable_alert: 1
+

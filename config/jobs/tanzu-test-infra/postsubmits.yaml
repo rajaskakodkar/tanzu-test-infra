@@ -8,8 +8,8 @@ postsubmits:
     - ^main$
     run_if_changed: '^images/image-build*'
     annotations:
-      testgrid-dashboards: build-images
-      testgrid-tab-name: image-builder
+      testgrid-dashboards: testing-images
+      testgrid-tab-name: post-image-builder
     labels:
       preset-registry-credentials: "true"
       preset-dind-enabled: "true"
@@ -32,8 +32,8 @@ postsubmits:
     - ^main$
     run_if_changed: '^images/test-image*'
     annotations:
-      testgrid-dashboards: build-images
-      testgrid-tab-name: test-image
+      testgrid-dashboards: testing-images
+      testgrid-tab-name: post-test-image
     labels:
       preset-registry-credentials: "true"
       preset-dind-enabled: "true"
