@@ -39,7 +39,7 @@ sinker:
 deck:
   spyglass:
     size_limit: 100000000 # 100MB
-    gcs_browser_prefix: https://console.cloud.google.com/storage/browser/
+    gcs_browser_prefix: https://s3.console.aws.amazon.com/s3/buckets/
     lenses:
     - lens:
         name: metadata
