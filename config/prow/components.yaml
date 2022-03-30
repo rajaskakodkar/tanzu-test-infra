@@ -201,7 +201,7 @@ spec:
         - --github-endpoint=http://ghproxy
         - --github-endpoint=https://api.github.com
         - --github-graphql-endpoint=http://ghproxy/graphql
-        - --s3-credentials-file=/etc/s3-credentials/s3-credentials.json
+        - --s3-credentials-file=/etc/s3-credentials/service-account.json
         - --spyglass=true
         - --github-app-id=$(GITHUB_APP_ID)
         - --github-app-private-key-path=/etc/github/cert
@@ -372,7 +372,7 @@ spec:
         - --github-endpoint=http://ghproxy
         - --github-endpoint=https://api.github.com
         - --github-graphql-endpoint=http://ghproxy/graphql
-        - --s3-credentials-file=/etc/s3-credentials/s3-credentials.json
+        - --s3-credentials-file=/etc/s3-credentials/service-account.json
         - --status-path=s3://tanzu-prow-logs/tide-status
         - --history-uri=s3://tanzu-prow-logs/tide-history.json
         - --github-app-id=$(GITHUB_APP_ID)
@@ -500,7 +500,7 @@ spec:
         - --config-path=/etc/config/config.yaml
         - --github-endpoint=http://ghproxy
         - --github-endpoint=https://api.github.com
-        - --s3-credentials-file=/etc/s3-credentials/s3-credentials.json
+        - --s3-credentials-file=/etc/s3-credentials/service-account.json
         - --status-path=s3://tanzu-prow-logs/status-reconciler-status
         - --github-app-id=$(GITHUB_APP_ID)
         - --github-app-private-key-path=/etc/github/cert
@@ -1118,7 +1118,7 @@ spec:
         args:
         - --blob-storage-workers=10
         - --config-path=/etc/config/config.yaml
-        - --s3-credentials-file=/etc/s3-credentials/s3-credentials.json
+        - --s3-credentials-file=/etc/s3-credentials/service-account.json
         - --github-endpoint=http://ghproxy
         - --github-endpoint=https://api.github.com
         - --github-workers=10
