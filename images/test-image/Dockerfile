@@ -6,7 +6,8 @@ RUN apt-get update && \
     # TCE build expects sudo to be present
     sudo \
     zip \
-    python3-pip
+    python3-pip \
+    skopeo
 
 # Go standard envs
 ENV GOPATH /go
