@@ -1,0 +1,26 @@
+gcr.io:
+  images:
+    k8s-prow/hook: []
+    k8s-prow/sinker: []
+    k8s-prow/deck: []
+    k8s-prow/horologium: []
+    k8s-prow/status-reconciler: []
+    k8s-prow/ghproxy: []
+    k8s-prow/prow-controller-manager: []
+    k8s-prow/crier: []
+    k8s-prow/checkconfig: []
+    k8s-prow/clonerefs: []
+    k8s-prow/initupload: []
+    k8s-prow/entrypoint: []
+    k8s-prow/sidecar: []
+    k8s-staging-boskos/boskos: []
+    k8s-staging-boskos/aws-janitor-boskos: []
+    k8s-staging-boskos/cleaner: []
+    k8s-staging-boskos/reaper: []
+    k8s-testgrid/summarizer: []
+    k8s-testgrid/updater: []
+
+ghcr.io:
+  images:
+    external-secrets/kubernetes-external-secrets: []
+

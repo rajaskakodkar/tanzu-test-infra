@@ -11,6 +11,7 @@ periodics:
     testgrid-tab-name: periodics
   labels:
     preset-dind-enabled: "true"
+    preset-aws-credential: "true"
   spec:
     containers:
     - image: public.ecr.aws/t0q8k6g2/vagator/test-image:v20222903-be6db42
