@@ -1,6 +1,6 @@
 #!/bin/sh
 
-AWS_REGION="us-east-2"
+AWS_REGION="us-east-1"
 ECR_REGISTRY_TOKEN="t0q8k6g2"
 
 ARTIFACTS="${ARTIFACTS:-${PWD}/_artifacts}"
@@ -8,7 +8,6 @@ mkdir -p "$ARTIFACTS/logs/"
 
 # list of image repositories to sync in internal ecr
 declare -a images=(
-		   "another-test"
 		   "hook"
 		   "sinker"
 		   "deck"
@@ -46,6 +45,6 @@ done
 
 # Sync the upstream/third-party image tags with internal ecr images
 
-echo "[INFO] Starting syncing images to ECR..."
+echo "[INFO] Starting image sync to ECR ..."
 printf '~%.0s' {1..80}; echo
 skopeo sync --src yaml source-images.yaml --dest docker public.ecr.aws/${ECR_REGISTRY_TOKEN}/ --keep-going

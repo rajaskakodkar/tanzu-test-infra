@@ -1,0 +1,24 @@
+postsubmits:
+  rajaskakodkar/tanzu-test-infra:
+  - name: postsubmit-mirror-upstream-images-to-ecr
+    cluster: test-jobs
+    decorate: true
+    max_concurrency: 1
+    branches:
+    - ^main$
+    run_if_changed: '^scripts/mirror-images/source-images.yaml'
+    annotations:
+      testgrid-dashboards: mirror-upstream-images
+      testgrid-tab-name: mirror-upstream-images-postsubmits
+    labels:
+      preset-registry-credentials: "true"
+      preset-aws-credentials: "true"
+    spec:
+      containers:
+      - image: public.ecr.aws/t0q8k6g2/vagator/test-image:v20222903-be6db42
+        command:
+        - /usr/local/bin/run.sh
+        args:
+        - rajaskakodkar
+        - tanzu-test-infra
+        - ./scripts/mirror-images/sync-upstream-images-with-ecr.sh
