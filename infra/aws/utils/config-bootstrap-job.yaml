@@ -1,0 +1,77 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: prow-config-bootstrap
+  namespace: prow
+spec:
+  template:
+    spec:
+      serviceAccountName: "config-bootstrap"
+      initContainers:
+      - name: clone-myrepo
+        image: alpine/git:1.0.34
+        args:
+        - clone
+        - --single-branch
+        - --
+        - https://github.com/AndyTauber/andy-infra.git
+        - /andy-infra
+        volumeMounts:
+        - name: andy-infra
+          mountPath: /andy-infra
+      containers:
+      - name: prow-config-bootstrapper
+        image: gcr.io/k8s-prow/config-bootstrapper:v20220331-c4e1c201d5
+        args:
+        - --dry-run=false
+        - --source-path=/andy-infra
+        - --config-path=/andy-infra/config/prow/config.yaml
+        - --plugin-config=/andy-infra/config/prow/plugins.yaml
+        - --job-config-path=/andy-infra/config/jobs
+        volumeMounts:
+        - name: andy-infra
+          mountPath: /andy-infra
+      restartPolicy: Never
+      volumes:
+      - name: andy-infra
+        emptyDir: {}
+  backoffLimit: 4
+---
+kind: ServiceAccount
+apiVersion: v1
+metadata:
+  namespace: prow
+  name: "config-bootstrap"
+---
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: prow
+  name: "config-bootstrap"
+rules:
+  - apiGroups:
+      - ""
+    resources:
+      - configmaps
+    verbs:
+      - create
+      - list
+      - watch
+      - get
+      - create
+      - update
+      - edit
+      - patch
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: prow
+  name: "config-bootstrap"
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: "config-bootstrap"
+subjects:
+- kind: ServiceAccount
+  name: "config-bootstrap"
