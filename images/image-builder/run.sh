@@ -5,19 +5,6 @@ export registry_path="${2}"
 
 source /usr/local/bin/dind.sh
 
-# Configuring docker-credential-helper-ecr
-cat > ~/.docker/config.json << EOF
-{
-"credsStore": "ecr-login"
-}
-{
-	"credHelpers": {
-		"public.ecr.aws": "ecr-login",
-		"<aws_account_id>.dkr.ecr.<region>.amazonaws.com":"ecr-login"
-	}
-}
-EOF
-
 # Check for REGISTRY creds
 export REGISTRY_ENABLED=${REGISTRY_ENABLED:-false}
 if [[ "${REGISTRY_ENABLED}" == "true" ]]; then
@@ -27,6 +14,12 @@ if [[ "${REGISTRY_ENABLED}" == "true" ]]; then
   export REGISTRY_PASSWORD=${REGISTRY_PASSWORD:-false}
   export AWS_ACCESS_KEY_ID=$(cat ${AWS_ACCESS_KEY_ID})
   export AWS_SECRET_ACCESS_KEY=$(cat ${AWS_SECRET_ACCESS_KEY})
+  # Configuring docker-credential-helper-ecr
+  cat > ~/.docker/config.json << EOF
+  {
+  "credsStore": "ecr-login"
+  }
+  EOF
   # Build image
   cd "${dockerfile_path}"
   docker build -t "${registry_path}" . || { error "Failed to build image in ${registry_path}"; exit 1; }
