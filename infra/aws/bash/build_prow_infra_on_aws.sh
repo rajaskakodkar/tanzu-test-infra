@@ -229,8 +229,8 @@ function replace_prow_variables {
     # create new /prow and /job folders
     rm -rf "${REPO_PATH}"/config/prow
     rm -rf "${REPO_PATH}"/config/jobs
-    cp -r "${REPO_PATH}"/config/prow-variable "${REPO_PATH}"/config/prow
-    cp -r "${REPO_PATH}"/config/jobs-variable "${REPO_PATH}"/config/jobs
+    cp -r "${REPO_PATH}"/infra/aws/configs/prow-variable "${REPO_PATH}"/config/prow
+    cp -r "${REPO_PATH}"/infra/aws/configs/jobs-variable "${REPO_PATH}"/config/jobs
 
     # replace variables for core prow
     gsed -i -e "s/CERT_EMAIL/${CERT_EMAIL}/g" "${REPO_PATH}"/config/prow/cluster-issuer.yaml;
@@ -245,6 +245,8 @@ function replace_prow_variables {
     gsed -i -e "s/GITHUB_REPO2/${GITHUB_REPO2}/g" "${REPO_PATH}"/config/prow/plugins.yaml;
     gsed -i -e "s/GITHUB_ORG/${GITHUB_ORG}/g" "${REPO_PATH}"/config/prow/job-seed.yaml;
     gsed -i -e "s/GITHUB_REPO1/${GITHUB_REPO1}/g" "${REPO_PATH}"/config/prow/job-seed.yaml;
+    gsed -i -e "s/SECRETS_ROLE_ARN/${SECRETS_ROLE_ARN}/g" "${REPO_PATH}"/config/prow/cluster/external-secrets.yaml;
+    gsed -i -e "s/SECRETS_ROLE_ARN/${SECRETS_ROLE_ARN}/g" "${REPO_PATH}"/config/prow/cluster/kubernetes-external-secrets_sa.yaml;
 
     # recurse through all jobs and replace variables
     if [[ $BUILD_OS == "Darwin" ]]; then

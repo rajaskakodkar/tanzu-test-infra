@@ -87,6 +87,7 @@ export REGISTRY_PUSH="public.ecr.aws/<registry address>"
 Use the following variables to create the secrets
 ```
 export USE_EXTERNAL_SECRETS=false
+export SECRETS_ROLE_ARN="arn:aws:iam::609817409085:role/prow-ecr"
 export KUBECONFIG_PATH="path-to/kubeconfig.yaml"
 # where is gencred
 export K8S_TESTINFRA_PATH="/path-to/prow/kubernetes/test-infra"
