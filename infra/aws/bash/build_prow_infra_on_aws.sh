@@ -235,8 +235,8 @@ function replace_prow_variables {
     # replace variables for core prow
     gsed -i -e "s/CERT_EMAIL/${CERT_EMAIL}/g" "${REPO_PATH}"/config/prow/cluster-issuer.yaml;
     gsed -i -e "s/PROW_FQDN/${PROW_FQDN}/g" "${REPO_PATH}"/config/prow/cluster/ingress.yaml;
-    gsed -i -e "s/GCS_BUCKET/${GCS_BUCKET}/g" "${REPO_PATH}"/config/prow/cluster/tide.yaml;
-    gsed -i -e "s/GCS_BUCKET/${GCS_BUCKET}/g" "${REPO_PATH}"/config/prow/cluster/statusreconciler.yaml;
+    gsed -i -e "s/GCS_BUCKET/${GCS_BUCKET}/g" "${REPO_PATH}"/config/prow/cluster/tide_deployment.yaml;
+    gsed -i -e "s/GCS_BUCKET/${GCS_BUCKET}/g" "${REPO_PATH}"/config/prow/cluster/statusreconciler_deployment.yaml;
     gsed -i -e "s/PROW_FQDN/${PROW_FQDN}/g" "${REPO_PATH}"/config/prow/config.yaml;
     gsed -i -e "s/GCS_BUCKET/${GCS_BUCKET}/g" "${REPO_PATH}"/config/prow/config.yaml;
     gsed -i -e "s/GITHUB_ORG/${GITHUB_ORG}/g" "${REPO_PATH}"/config/prow/config.yaml;
@@ -259,11 +259,6 @@ function replace_prow_variables {
       grep -rl 'GITHUB_ORG' "${REPO_PATH}"/config/jobs | xargs sed -i "s/GITHUB_REPO2/${GITHUB_REPO2}/g"
     fi
 
-    # push the new folders to the repo
-    cd "${REPO_PATH}"
-    git add .
-    git commit -m "updated jobs and prow directories"
-    git push
 }
 
 function install_prow_on_service_cluster {
@@ -302,27 +297,31 @@ function install_prow_on_service_cluster {
 
     # secrets
     echo "Creating secrets..."
-    kubectl -n prow create secret generic registry-username --from-literal=username=${REGISTRY_USERNAME}
-    kubectl -n prow create secret generic registry-password --from-literal=password=${REGISTRY_PASSWORD}
-
     kubectl -n prow create secret generic aws-access-key-id --from-literal=aws-access-key-id=${AWS_ACCESS_KEY_ID}
     kubectl -n prow create secret generic aws-access-key-secret --from-literal=aws-access-key-secret=${AWS_SECRET_ACCESS_KEY}
 
-    kubectl -n prow create secret generic gcs-credentials --from-file=${GCS_CREDENTIAL_PATH}
-    kubectl -n test-pods create secret generic gcs-credentials --from-file=${GCS_CREDENTIAL_PATH}
+    if [ "$USE_EXTERNAL_SECRETS" = false ]; then
 
-    # create hmac token
-    kubectl -n prow create secret generic hmac-token --from-file=hmac=${HMAC_TOKEN_PATH}
+      kubectl -n prow create secret generic registry-username --from-literal=username=${REGISTRY_USERNAME}
+      kubectl -n prow create secret generic registry-password --from-literal=password=${REGISTRY_PASSWORD}
 
-    # create github token
-    kubectl -n prow create secret generic github-token --from-file=cert=${GITHUB_TOKEN_PATH} --from-literal=appid=${GITHUB_APP_ID}
+      kubectl -n prow create secret generic gcs-credentials --from-file=${GCS_CREDENTIAL_PATH}
+      kubectl -n test-pods create secret generic gcs-credentials --from-file=${GCS_CREDENTIAL_PATH}
 
-    # create oauth token in test-pods for autobump to use
-    kubectl -n test-pods create secret generic github-token --from-file=oauth=${OAUTH_TOKEN_PATH}
+      # create hmac token
+      kubectl -n prow create secret generic hmac-token --from-file=hmac=${HMAC_TOKEN_PATH}
 
-    # create github OAuth secrets
-    kubectl -n prow create secret generic github-oauth-config --from-file=secret=${OAUTH_CONFIG_PATH}
-    kubectl -n prow create secret generic cookie --from-file=secret=${COOKIE_PATH}
+      # create github token
+      kubectl -n prow create secret generic github-token --from-file=cert=${GITHUB_TOKEN_PATH} --from-literal=appid=${GITHUB_APP_ID}
+
+      # create oauth token in test-pods for autobump to use
+      kubectl -n test-pods create secret generic github-token --from-file=oauth=${OAUTH_TOKEN_PATH}
+
+      # create github OAuth secrets
+      kubectl -n prow create secret generic github-oauth-config --from-file=secret=${OAUTH_CONFIG_PATH}
+      kubectl -n prow create secret generic cookie --from-file=secret=${COOKIE_PATH}
+
+    fi
 
     # create kubeconfig secret
     kubectl -n prow create secret generic kubeconfig --from-file=config="${KUBECONFIG_PATH}"
@@ -420,7 +419,7 @@ function install_base_packages_on_service_cluster {
     error "UNEXPECTED FAILURE OCCURRED INSTALLING CERT-MANAGER!"
     exit 1
   }
-  tanzu package install contour --package-name contour.community.tanzu.vmware.com --version 1.18.1 -f ${REPO_PATH}/config/prow/contour-values.yaml || {
+  tanzu package install contour --package-name contour.community.tanzu.vmware.com --version 1.18.1 -f ${REPO_PATH}/infra/aws/configs/prow-variable/contour-values.yaml || {
     error "UNEXPECTED FAILURE OCCURRED INSTALLING CONTOUR"
     exit 1
   }
@@ -439,3 +438,6 @@ replace_prow_variables || exit 1
 
 install_prow_on_service_cluster || exit 1
 install_prow_on_build_cluster || exit 1
+
+echo "Prow build finished..."
+echo "Please push your updated local repo and create a PR to merge changes in..."
