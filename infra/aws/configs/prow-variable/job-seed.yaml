@@ -1,0 +1,9 @@
+postsubmits:
+  GITHUB_ORG/GITHUB_REPO1:
+  - name: test-postsubmit-GITHUB_REPO1
+    cluster: prow-service-trusted
+    decorate: true
+    spec:
+      containers:
+      - image: alpine
+        command: ["/bin/printenv"]

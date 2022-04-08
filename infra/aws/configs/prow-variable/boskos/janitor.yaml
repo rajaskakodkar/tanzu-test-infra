@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: boskos-janitor-aws
+  labels:
+    app: boskos-janitor-aws
+spec:
+  replicas: 1 # 4 distributed janitor instances
+  selector:
+    matchLabels:
+      app: boskos-janitor-aws
+  template:
+    metadata:
+      labels:
+        app: boskos-janitor-aws
+    spec:
+      terminationGracePeriodSeconds: 300
+      containers:
+      - name: boskos-janitor-aws
+        image: gcr.io/k8s-staging-boskos/aws-janitor-boskos:v20211118-344faec
+        args:
+        - --boskos-url=http://boskos.test-pods.svc.cluster.local.
+        - --region=ap-south-1
+        - --dry-run=true
+        - --include-tags=test=boskos,anothertag=boskos-test
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: boskos-janitor-aws
+  namespace: test-pods

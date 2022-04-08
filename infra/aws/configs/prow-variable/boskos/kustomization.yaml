@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: test-pods
+
+resources:
+  - namespace.yaml
+  - crd.yaml
+  - rbac.yaml
+  - janitor.yaml
+  - reaper.yaml
+  - cleaner.yaml
+
+configMapGenerator:
+  - name: resources
+    files:
+      - boskos-resources.yaml
+
+generatorOptions:
+  disableNameSuffixHash: true        
