@@ -1,6 +1,7 @@
 postsubmits:
   rajaskakodkar/tanzu-test-infra:
   - name: build-test-image
+    cluster: prow-build
     decorate: true
     run_if_changed: "images/test/.*"
     branches:
@@ -29,4 +30,3 @@ postsubmits:
       volumes:
       - name: dind-storage
         emptyDir: {}
-

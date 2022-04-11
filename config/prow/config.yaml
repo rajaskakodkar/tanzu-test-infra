@@ -8,12 +8,12 @@ plank:
       timeout: 2h
       grace_period: 15m
       utility_images:
-        clonerefs: "gcr.io/k8s-prow/clonerefs:v20211203-281e29a97a"
-        initupload: "gcr.io/k8s-prow/initupload:v20211203-281e29a97a"
-        entrypoint: "gcr.io/k8s-prow/entrypoint:v20211203-281e29a97a"
-        sidecar: "gcr.io/k8s-prow/sidecar:v20211203-281e29a97a"
+        clonerefs: "gcr.io/k8s-prow/clonerefs:v20220331-c4e1c201d5"
+        initupload: "gcr.io/k8s-prow/initupload:v20220331-c4e1c201d5"
+        entrypoint: "gcr.io/k8s-prow/entrypoint:v20220331-c4e1c201d5"
+        sidecar: "gcr.io/k8s-prow/sidecar:v20220331-c4e1c201d5"
       gcs_configuration:
-        bucket: "vagator-prow"
+        bucket: "vmware-prow"
         path_strategy: "explicit"
       gcs_credentials_secret: "gcs-credentials"
       resources:
