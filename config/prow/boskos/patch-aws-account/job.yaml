@@ -35,11 +35,11 @@ spec:
         - name: ACCESS_KEY_ID
           valueFrom:
             secretKeyRef:
-              name: aws-access-key-id
-              key: aws-access-key-id
+              name: tanzu-prow-bot
+              key: AWS_ACCESS_KEY_ID
         - name: ACCESS_KEY_SECRET
           valueFrom:
             secretKeyRef:
-              name: aws-access-key-secret
-              key: aws-access-key-secret
+              name: tanzu-prow-bot
+              key: AWS_SECRET_ACCESS_KEY
       restartPolicy: Never

@@ -158,64 +158,27 @@ presets:
       hostPath:
         path: /sys/fs/cgroup
         type: Directory
-# AWS ECR registry creds
-- labels:
-    preset-registry-credentials: "true"
-  env:
-  - name: REGISTRY_ENABLED
-    value: "true"
-  - name: REGISTRY_USERNAME
-    value: /etc/registry-username/username
-  - name: REGISTRY_PASSWORD
-    value: /etc/registry-password/password
-  volumes:
-  - name: registry-username
-    secret:
-      defaultMode: 0400
-      secretName: registry-username
-  - name: registry-password
-    secret:
-      defaultMode: 0400
-      secretName: registry-password
-  volumeMounts:
-  - name: registry-username
-    mountPath: /etc/registry-username
-    readOnly: true
-  - name: registry-password
-    mountPath: /etc/registry-password
-    readOnly: true
 # AWS credentials
 - labels:
     preset-aws-credentials: "true"
   env:
   - name: AWS_ACCESS_KEY_ID
-    value: /etc/aws-access-key-id/aws-access-key-id
-  - name: AWS_SECRET_ACCESS_KEY
-    value: /etc/aws-access-key-secret/aws-access-key-secret
-  - name: AWS_B64ENCODED_CREDENTIAL
     valueFrom:
       secretKeyRef:
-        name: aws-b64encoded-credential
-        key: aws-b64encoded-credential
+        name: tanzu-prow-bot
+        key: AWS_ACCESS_KEY_ID
+  - name: AWS_SECRET_ACCESS_KEY
+    valueFrom:
+      secretKeyRef:
+        name: tanzu-prow-bot
+        key: AWS_SECRET_ACCESS_KEY
   - name: AWS_SSH_KEY_NAME
     valueFrom:
       secretKeyRef:
-        name: aws-ssh-key-name
-        key: aws-ssh-key-name
-  volumes:
-  - name: aws-access-key-id
-    secret:
-      defaultMode: 0400
-      secretName: aws-access-key-id
-  - name: aws-access-key-secret
-    secret:
-      defaultMode: 0400
-      secretName: aws-access-key-secret
-  volumeMounts:
-  - name: aws-access-key-id
-    mountPath: /etc/aws-access-key-id
-    readOnly: true
-  - name: aws-access-key-secret
-    mountPath: /etc/aws-access-key-secret
-    readOnly: true
-
+        name: tanzu-prow-bot
+        key: AWS_SSH_KEY_NAME
+  - name: AWS_REGION
+    valueFrom:
+      secretKeyRef:
+        name: tanzu-prow-bot
+        key: AWS_REGION
