@@ -1,0 +1,9 @@
+postsubmits:
+  rajaskakodkar/tanzu-test-infra:
+  - name: test-postsubmit-tanzu-test-infra
+    cluster: prow-service-trusted
+    decorate: true
+    spec:
+      containers:
+      - image: alpine
+        command: ["/bin/printenv"]

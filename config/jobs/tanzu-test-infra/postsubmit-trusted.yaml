@@ -1,0 +1,53 @@
+# ProwJobs defined in this file specify cluster: prow-service-trusted in order to run in Prow's service cluster.
+postsubmits:
+  rajaskakodkar/tanzu-test-infra:
+  - name: post-infra-deploy-prow
+    cluster: prow-service-trusted
+    run_if_changed: '^config/prow/cluster/'
+    decorate: true
+    branches:
+    - main
+    spec:
+      containers:
+      - image: public.ecr.aws/l3j4k1y7/vmware-tanzu/test-image:v20221003-6f693ab
+        command:
+        - /usr/local/bin/run.sh
+        args:
+        - rajaskakodkar
+        - tanzu-test-infra
+        - cd ./config && kubectl --context=prow-service-trusted apply -f ./prow/cluster/
+        env:
+        - name: KUBECONFIG
+          value: "/etc/kubeconfig/config:/etc/kubeconfig/config"
+        volumeMounts:
+        - name: kubeconfig
+          mountPath: /etc/kubeconfig
+      volumes:
+      - name: kubeconfig
+        secret:
+          secretName: kubeconfig
+
+periodics:
+- cron: "*/15 * * * 1-5"  # Bump don't label `skip-review`. Run at :15 past every hour Mon-Fri
+  name: periodic-infra-autobump-prow
+  cluster: prow-service-trusted
+  decorate: true
+  extra_refs:
+  - org: rajaskakodkar
+    repo: tanzu-test-infra
+    base_ref: main
+  spec:
+    containers:
+    - image: gcr.io/k8s-prow/generic-autobumper:v20220331-c4e1c201d5
+      command:
+      - generic-autobumper
+      args:
+      - --config=config/prow/autobump-config/prow-component-autobump-config.yaml
+      volumeMounts:
+      - name: github-token
+        mountPath: /etc/github-token
+        readOnly: true
+    volumes:
+    - name: github-token
+      secret:
+        secretName: github-token

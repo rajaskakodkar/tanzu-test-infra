@@ -253,10 +253,12 @@ function replace_prow_variables {
       egrep -rl 'GITHUB_ORG' "${REPO_PATH}"/config/jobs | xargs -I@ gsed -i -e "s/GITHUB_ORG/${GITHUB_ORG}/g" @
       egrep -rl 'GITHUB_REPO1' "${REPO_PATH}"/config/jobs | xargs -I@ gsed -i -e "s/GITHUB_REPO1/${GITHUB_REPO1}/g" @
       egrep -rl 'GITHUB_REPO2' "${REPO_PATH}"/config/jobs | xargs -I@ gsed -i -e "s/GITHUB_REPO2/${GITHUB_REPO2}/g" @
+      egrep -rl 'REGISTRY_PUSH' "${REPO_PATH}"/config/jobs | xargs -I@ gsed -i -e "s/REGISTRY_PATH/${REGISTRY_PATH}/g" @
     elif [[ $BUILD_OS == "Linux" ]]; then
       grep -rl 'GITHUB_ORG' "${REPO_PATH}"/config/jobs | xargs sed -i "s/GITHUB_ORG/${GITHUB_ORG}/g"
-      grep -rl 'GITHUB_ORG' "${REPO_PATH}"/config/jobs | xargs sed -i "s/GITHUB_REPO1/${GITHUB_REPO1}/g"
-      grep -rl 'GITHUB_ORG' "${REPO_PATH}"/config/jobs | xargs sed -i "s/GITHUB_REPO2/${GITHUB_REPO2}/g"
+      grep -rl 'GITHUB_REPO1' "${REPO_PATH}"/config/jobs | xargs sed -i "s/GITHUB_REPO1/${GITHUB_REPO1}/g"
+      grep -rl 'GITHUB_REPO2' "${REPO_PATH}"/config/jobs | xargs sed -i "s/GITHUB_REPO2/${GITHUB_REPO2}/g"
+      grep -rl 'REGISTRY_PUSH' "${REPO_PATH}"/config/jobs | xargs sed -i "s/REGISTRY_PUSH/${REGISTRY_PUSH}/g"
     fi
 
 }
