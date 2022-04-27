@@ -278,6 +278,7 @@ function install_prow_on_service_cluster {
     echo "Create initial kubeconfig file..."
     rm -f "${KUBECONFIG_PATH}"
     cd "${K8S_TESTINFRA_PATH}"
+    go run ./gencred --context=prow-mgr-admin@prow-mgr --name=prow-mgr --output="${KUBECONFIG_PATH}"
     go run ./gencred --context=prow-service-admin@prow-service --name=prow-service-trusted --output="${KUBECONFIG_PATH}"
     go run ./gencred --context=prow-service-admin@prow-service --name=default --output="${KUBECONFIG_PATH}"
     cd "${REPO_PATH}"/config/prow
