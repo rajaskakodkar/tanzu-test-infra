@@ -2,11 +2,12 @@ dashboard_groups:
 - name: tanzu-test-infra
   dashboard_names:
     - testing-images
+    - mirror-upstream-images
 - name: tce
   dashboard_names:
     - CAPD
 
 dashboards:
 - name: testing-images
+- name: mirror-upstream-images
 - name: CAPD
-  
