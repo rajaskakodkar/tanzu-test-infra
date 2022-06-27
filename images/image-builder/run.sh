@@ -14,8 +14,12 @@ if [[ "${REGISTRY_ENABLED}" == "true" ]]; then
   export REGISTRY_PASSWORD=${REGISTRY_PASSWORD:-false}
   export AWS_ACCESS_KEY_ID=$(cat ${AWS_ACCESS_KEY_ID})
   export AWS_SECRET_ACCESS_KEY=$(cat ${AWS_SECRET_ACCESS_KEY})
-  # Login into registry
-  aws ecr-public get-login-password --region us-east-1 | docker login --username $(cat ${REGISTRY_USERNAME}) --password-stdin public.ecr.aws || { error "Failed to login to ECR"; exit 1; }
+  # Configuring docker-credential-helper-ecr
+  cat > ~/.docker/config.json << EOF
+  {
+  "credsStore": "ecr-login"
+  }
+  EOF
   # Build image
   cd "${dockerfile_path}"
   docker build -t "${registry_path}" . || { error "Failed to build image in ${registry_path}"; exit 1; }

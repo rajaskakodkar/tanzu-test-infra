@@ -10,7 +10,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     lsb-release \
     git \
     unzip \
-    jq
+    jq \
+    amazon-ecr-credential-helper
 
 # Add the Docker apt-repository
 RUN curl -fsSL https://download.docker.com/linux/$(. /etc/os-release; echo "$ID")/gpg \
