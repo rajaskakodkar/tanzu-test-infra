@@ -1,0 +1,18 @@
+# prow app variables
+export GITHUB_APP_ID=183096
+export GITHUB_ORG="rajaskakodkar"
+export GITHUB_REPO1="tanzu-test-infra"
+export GITHUB_REPO2="test-prow"
+export MY_EMAIL="atauber@vmware.com"
+export JOB_CONFIG_PATH="/Users/atauber/prow/tanzu-test-infra/config/prow/job-seed.yaml"
+export GCS_BUCKET="prow-prod-logs"
+export PROW_FQDN="prow.tanzu.io"
+export STATIC_IP_NAME="prow-static-ingress"
+export REGISTRY_PUSH="us-west1-docker.pkg.dev/prow-tkg-build/prow-prod-registry"
+export KUBECONFIG_PATH="/Users/atauber/prow/gcp-prow-creds/kubeconfig.yaml"
+export K8S_TESTINFRA_PATH="/Users/atauber/prow/kubernetes/test-infra"
+export SERVICE_CLUSTER_NAME="gke_prow-tkg-build_us-west1_prow-service"
+export BUILD_CLUSTER_NAME="gke_prow-tkg-build_us-west1_prow-build"
+export HOME_NET="75.190.40.0/24"
+export REGION="us-west1"
+export PROJECT="prow-tkg-build"

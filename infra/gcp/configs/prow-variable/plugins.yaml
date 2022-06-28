@@ -1,0 +1,105 @@
+# Plugin configuration
+---
+triggers:
+- repos:
+  - GITHUB_ORG/GITHUB_REPO1
+  - GITHUB_ORG/GITHUB_REPO2
+
+approve:
+- repos:
+  - GITHUB_ORG/GITHUB_REPO1
+  - GITHUB_ORG/GITHUB_REPO2
+  require_self_approval: false
+
+help:
+  help_guidelines_summary: |
+                        Please ensure that the issue body includes answers to the following questions:
+                        - Why are we solving this issue?
+                        - To address this issue, are there any code changes? If there are code changes, what needs to be done in the code and what places can the assignee treat as reference points?
+                        - Does this issue have zero to low barrier of entry?
+                        - How can the assignee reach out to you for help?
+
+# Lower bounds in number of lines changed; XS is assumed to be zero.
+size:
+  s:   10
+  m:   30
+  l:   100
+  xl:  500
+  xxl: 1000
+
+lgtm:
+- repos:
+  - GITHUB_ORG/GITHUB_REPO1
+  - GITHUB_ORG/GITHUB_REPO2
+  review_acts_as_lgtm: true
+
+cat:
+  key_path: /etc/cat-api/api-key
+
+goose:
+  key_path: /etc/unsplash-api/honk.txt
+
+heart:
+  adorees:
+  - mirandachrist
+  commentregexp: ".*"
+
+config_updater:
+  maps:
+    config/prow/config.yaml:
+      name: config
+    config/prow/plugins.yaml:
+      name: plugins
+    config/jobs/**/*.yaml:
+      name: job-config
+      gzip: true
+    experiment/test-configmap.txt:
+      name: test-configmap
+      gzip: true
+
+welcome:
+- repos:
+  - GITHUB_REPO1
+  - GITHUB_REPO2
+  message_template: "Welcome @{{.AuthorLogin}}! <br><br>It looks like this is your first PR to <a href='https://github.com/{{.Org}}/{{.Repo}}'>{{.Org}}/{{.Repo}}</a> 🎉. You will be prompted by a bot to use commands during the review process. Do not be afraid to follow the prompts! It is okay to experiment."
+
+retitle:
+  allow_closed_issues: true
+
+# Enabled plugins per repo.
+# Keys: Full repo name: "org/repo".
+# Values: List of plugins to run against the repo.
+plugins:
+  # Enable the following for any bazelbuild repo (rules_k8s, rules_docker) that sends prow webhooks
+  # Repos that do not send prow webhooks will see no effect.
+  GITHUB_ORG:
+    plugins:
+    - approve
+    - assign
+    - cat
+    - cla
+    - dog
+    - golint
+    - goose
+    - heart
+    - help
+    - hold
+    - label
+    - lgtm
+    - owners-label
+    - pony
+    - retitle
+    - shrug
+    - size
+    - skip
+    - transfer-issue
+    - trick-or-treat
+    - trigger
+    - verify-owners
+    - welcome
+    - wip
+    - yuks
+
+  GITHUB_ORG/GITHUB_REPO1:
+    plugins:
+    - config-updater

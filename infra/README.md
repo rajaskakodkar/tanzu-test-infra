@@ -31,41 +31,49 @@ To get started:
    4) hmac secret
    5) oauth token
    6) GCP bucket service account
-3) create an env.txt file with the below export statements and update for your environment and keys.  Copy current cloudgate id/key/token to env.txt
-4) copy contents of env.txt to your terminal session to create environment variables in the session
-5) run ./build_prow_infra_on_aws.sh to start your build
-6) Update your DNS cname with ingress LB address
+3) create a AWS_VPC_ID
+   1) IPv4 CIDR: 10.0.0.0/16
+   2) DNS Hostnames: enabled
+4) create an env.txt file with the below export statements and update for your environment and keys.  Copy current cloudgate id/key/token to env.txt
+5) copy contents of env.txt to your terminal session to create environment variables in the session
+6) run ./build_prow_infra_on_aws.sh to start your build
+7) Update your DNS cname with ingress LB address
 
 Once all is deployed and running, the only job that will be configured will be what was originally configured in the job-seed.yaml file.  In order to implement any other jobs, you will need to edit the job yaml (add a comment) and submit that change via a PR for the config-updater to pick it up and update the job-config configmap.
 
-**cloudgate**
+**AWS Permissions**
 ```
 export AWS_ACCESS_KEY_ID=<access key id>
 export AWS_SECRET_ACCESS_KEY=<secret access key>
-export AWS_SESSION_TOKEN=<session token if managed account>
 
 ```
 **cluster variables**
 ```
-export AWS_AMI_ID="ami-"
+export AWS_AMI_ID="ami-084291fad0788831c"
 export AWS_REGION=us-east-1
 export AWS_NODE_AZ="us-east-1a"
+export AWS_NODE_AZ_1="us-east-1b"
+export AWS_NODE_AZ_2="us-east-1c"
 export AWS_SSH_KEY_NAME="default-aws"
+export AWS_VPC_ID="vpc-03d53bcda083c9b78"
 
 export MGMT_CLUSTER_NAME="prow-mgr"
-export MGMT_CLUSTER_PLAN="dev"
+export MGMT_CLUSTER_PLAN="prod"
 export MGMT_CONTROL_PLANE_MACHINE_TYPE="m5.large"
 export MGMT_NODE_MACHINE_TYPE="m5.large"
+export MGMT_ENABLE_AUTOSCALER="false"
 
 export SERVICE_CLUSTER_NAME="prow-service"
-export SERVICE_CLUSTER_PLAN="dev"
+export SERVICE_CLUSTER_PLAN="prod"
 export SERVICE_CONTROL_PLANE_MACHINE_TYPE="m5.large"
 export SERVICE_NODE_MACHINE_TYPE="m5.large"
+export SERVICE_ENABLE_AUTOSCALER="true"
 
 export BUILD_CLUSTER_NAME="prow-build"
-export BUILD_CLUSTER_PLAN="dev"
+export BUILD_CLUSTER_PLAN="prod"
 export BUILD_CONTROL_PLANE_MACHINE_TYPE="m5.large"
 export BUILD_NODE_MACHINE_TYPE="m5.large"
+export BUILD_ENABLE_AUTOSCALER="true
 ```
 
 **prow app variables**
@@ -87,13 +95,13 @@ export REGISTRY_PUSH="public.ecr.aws/<registry address>"
 Use the following variables to create the secrets
 ```
 export USE_EXTERNAL_SECRETS=false
-export SECRETS_ROLE_ARN="arn:aws:iam::609817409085:role/prow-ecr"
 export KUBECONFIG_PATH="path-to/kubeconfig.yaml"
 # where is gencred
 export K8S_TESTINFRA_PATH="/path-to/prow/kubernetes/test-infra"
 export GCS_CREDENTIAL_PATH="/path-to/service-account.json"
 export HMAC_TOKEN_PATH="/path-to/hmac-secret"
-export GITHUB_TOKEN_PATH="/path-to/andytauber-prow-test.2022-03-10.private-key.pem"
+export OAUTH_TOKEN_PATH="/path-to/prow/oauth-token"
+export GITHUB_TOKEN_PATH="/Users/atauber/prow/andytauber-prow-test.2022-03-10.private-key.pem"
 export OAUTH_CONFIG_PATH="/path-to/github-oauth-config"
 export COOKIE_PATH="/path-to/cookie.txt"
 # is registry password still created and this not used?

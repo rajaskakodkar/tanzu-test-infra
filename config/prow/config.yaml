@@ -13,7 +13,7 @@ plank:
         entrypoint: "gcr.io/k8s-prow/entrypoint:v20220331-c4e1c201d5"
         sidecar: "gcr.io/k8s-prow/sidecar:v20220331-c4e1c201d5"
       gcs_configuration:
-        bucket: "vmware-prow"
+        bucket: prow-prod-logs
         path_strategy: "explicit"
       gcs_credentials_secret: "gcs-credentials"
       resources:
@@ -40,8 +40,6 @@ deck:
   spyglass:
     size_limit: 100000000 # 100MB
     gcs_browser_prefix: https://console.cloud.google.com/storage/browser/
-    testgrid_config: gs://vagator-testgrid/config
-    testgrid_root: https://testgrid.k8s.io/r/vagator-testgrid/
     lenses:
     - lens:
         name: metadata
@@ -140,24 +138,6 @@ presets:
     mountPath: /docker-graph
   - name: docker-root
     mountPath: /var/lib/docker
-# volume mounts for kind
-- labels:
-    preset-kind-volume-mounts: "true"
-  volumeMounts:
-    - mountPath: /lib/modules
-      name: modules
-      readOnly: true
-    - mountPath: /sys/fs/cgroup
-      name: cgroup
-  volumes:
-    - name: modules
-      hostPath:
-        path: /lib/modules
-        type: Directory
-    - name: cgroup
-      hostPath:
-        path: /sys/fs/cgroup
-        type: Directory
 # AWS ECR registry creds
 - labels:
     preset-registry-credentials: "true"
@@ -192,16 +172,6 @@ presets:
     value: /etc/aws-access-key-id/aws-access-key-id
   - name: AWS_SECRET_ACCESS_KEY
     value: /etc/aws-access-key-secret/aws-access-key-secret
-  - name: AWS_B64ENCODED_CREDENTIAL
-    valueFrom:
-      secretKeyRef:
-        name: aws-b64encoded-credential
-        key: aws-b64encoded-credential
-  - name: AWS_SSH_KEY_NAME
-    valueFrom:
-      secretKeyRef:
-        name: aws-ssh-key-name
-        key: aws-ssh-key-name
   volumes:
   - name: aws-access-key-id
     secret:
@@ -218,4 +188,3 @@ presets:
   - name: aws-access-key-secret
     mountPath: /etc/aws-access-key-secret
     readOnly: true
-

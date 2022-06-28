@@ -30,8 +30,8 @@ spec:
         - --github-endpoint=https://api.github.com
         - --github-graphql-endpoint=http://ghproxy/graphql
         - --gcs-credentials-file=/etc/gcs-credentials/service-account.json
-        - --status-path=gs://vmware-prow/tide-status
-        - --history-uri=gs://vmware-prow/tide-history.json
+        - --status-path=gs://prow-prod-logs/tide-status
+        - --history-uri=gs://prow-prod-logs/tide-history.json
         - --github-app-id=$(GITHUB_APP_ID)
         - --github-app-private-key-path=/etc/github/cert
         env:

@@ -1,0 +1,18 @@
+# prow app variables
+export GITHUB_APP_ID=179462
+export GITHUB_ORG="AndyTauber"
+export GITHUB_REPO1="andy-infra"
+export GITHUB_REPO2="andy-prow"
+export MY_EMAIL="atauber@vmware.com"
+export JOB_CONFIG_PATH="/Users/atauber/prow/tanzu-test-infra/config/prow/job-seed.yaml"
+export GCS_BUCKET="sandbox-gcs-publisher"
+export PROW_FQDN="prow.andytauber.info"
+export STATIC_IP_NAME="prow-andy-ingress"
+export REGISTRY_PUSH="us-west1-docker.pkg.dev/prow-open-btr/prow-sandbox-registry-writer"
+export KUBECONFIG_PATH="/Users/atauber/prow/gcp-andy-creds/kubeconfig.yaml"
+export K8S_TESTINFRA_PATH="/Users/atauber/prow/kubernetes/test-infra"
+export SERVICE_CLUSTER_NAME="gke_prow-open-btr_us-west1_prow-service"
+export BUILD_CLUSTER_NAME="gke_prow-open-btr_us-west1_prow-build"
+export HOME_NET="75.190.40.0/24"
+export REGION="us-west1"
+export PROJECT="prow-open-btr"

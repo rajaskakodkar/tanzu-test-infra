@@ -16,12 +16,12 @@ postsubmits:
       preset-aws-credentials: "true"
     spec:
       containers:
-      - image: public.ecr.aws/l3j4k1y7/vmware-tanzu/image-builder:v20220803-dccc121
+      - image: REGISTRY_PUSH/image-builder:v20220803-dccc121
         command:
         - /usr/local/bin/run.sh
         args:
         - images/image-builder
-        - public.ecr.aws/l3j4k1y7/vmware-tanzu/image-builder
+        - REGISTRY_PUSH/image-builder
         securityContext:
           privileged: true
   - name: post-test-image
@@ -40,11 +40,11 @@ postsubmits:
       preset-aws-credentials: "true"
     spec:
       containers:
-      - image: public.ecr.aws/l3j4k1y7/vmware-tanzu/image-builder:v20220803-dccc121
+      - image: REGISTRY_PUSH/image-builder:v20220803-dccc121
         command:
         - /usr/local/bin/run.sh
         args:
         - images/test-image
-        - public.ecr.aws/l3j4k1y7/vmware-tanzu/test-image
+        - REGISTRY_PUSH/test-image
         securityContext:
           privileged: true

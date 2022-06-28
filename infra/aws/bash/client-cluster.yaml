@@ -1,0 +1,1908 @@
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: Cluster
+metadata:
+  annotations:
+    osInfo: ubuntu,20.04,amd64
+    tkg/plan: prod
+  labels:
+    tanzuKubernetesRelease: v1.22.8---vmware.1-tkg.1-tf-v0.11.4
+    tkg.tanzu.vmware.com/cluster-name: prowa-service
+  name: prowa-service
+  namespace: default
+spec:
+  clusterNetwork:
+    pods:
+      cidrBlocks:
+      - 100.96.0.0/11
+    services:
+      cidrBlocks:
+      - 100.64.0.0/13
+  controlPlaneRef:
+    apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+    kind: KubeadmControlPlane
+    name: prowa-service-control-plane
+  infrastructureRef:
+    apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+    kind: AWSCluster
+    name: prowa-service
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: AWSCluster
+metadata:
+  name: prowa-service
+  namespace: default
+spec:
+  bastion:
+    enabled: true
+  network:
+    cni:
+      cniIngressRules:
+      - description: antrea1
+        fromPort: 10349
+        protocol: tcp
+        toPort: 10349
+      - description: genev
+        fromPort: 6081
+        protocol: udp
+        toPort: 6081
+      - description: kapp-controller
+        fromPort: 10100
+        protocol: tcp
+        toPort: 10100
+    subnets:
+    - availabilityZone: us-east-1a
+      cidrBlock: ""
+      id: subnet-0a5ee2cc286212a87
+    - availabilityZone: us-east-1a
+      cidrBlock: ""
+      id: subnet-03a6bffe9779fc158
+      isPublic: true
+    - availabilityZone: us-east-1b
+      cidrBlock: ""
+      id: subnet-04553bfd1da51d58b
+      isPublic: true
+    - availabilityZone: us-east-1b
+      cidrBlock: ""
+      id: subnet-0444d1dc6e40269e1
+    - availabilityZone: us-east-1c
+      cidrBlock: ""
+      id: subnet-03d7c318c9bb19fc6
+      isPublic: true
+    - availabilityZone: us-east-1c
+      cidrBlock: ""
+      id: subnet-0cd599591047cb9cf
+    vpc:
+      cidrBlock: ""
+      id: "vpc-06b3d0152fade8b31"
+  region: us-east-1
+  sshKeyName: default-aws
+---
+apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+kind: KubeadmControlPlane
+metadata:
+  name: prowa-service-control-plane
+  namespace: default
+spec:
+  kubeadmConfigSpec:
+    clusterConfiguration:
+      apiServer:
+        extraArgs:
+          cloud-provider: aws
+          tls-cipher-suites: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_256_GCM_SHA384
+        timeoutForControlPlane: 8m0s
+      controllerManager:
+        extraArgs:
+          cloud-provider: aws
+          tls-cipher-suites: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+      dns:
+        imageRepository: projects.registry.vmware.com/tkg
+        imageTag: v1.8.4_vmware.9
+      etcd:
+        local:
+          dataDir: /var/lib/etcd
+          extraArgs:
+            cipher-suites: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+            experimental-initial-corrupt-check: "true"
+          imageRepository: projects.registry.vmware.com/tkg
+          imageTag: v3.5.2_vmware.3
+      imageRepository: projects.registry.vmware.com/tkg
+      scheduler:
+        extraArgs:
+          tls-cipher-suites: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+    initConfiguration:
+      nodeRegistration:
+        kubeletExtraArgs:
+          cloud-provider: aws
+          tls-cipher-suites: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+        name: '{{ ds.meta_data.local_hostname }}'
+    joinConfiguration:
+      nodeRegistration:
+        kubeletExtraArgs:
+          cloud-provider: aws
+          tls-cipher-suites: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+        name: '{{ ds.meta_data.local_hostname }}'
+    useExperimentalRetryJoin: true
+  machineTemplate:
+    infrastructureRef:
+      apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+      kind: AWSMachineTemplate
+      name: prowa-service-control-plane
+  replicas: 3
+  version: v1.22.8+vmware.1
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: AWSMachineTemplate
+metadata:
+  name: prowa-service-control-plane
+  namespace: default
+spec:
+  template:
+    spec:
+      ami:
+        id: ami-03714b1bf6617a560
+      iamInstanceProfile: control-plane.tkg.cloud.vmware.com
+      instanceType: m5.large
+      rootVolume:
+        size: 80
+      sshKeyName: default-aws
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: AWSMachineTemplate
+metadata:
+  name: prowa-service-md-0
+  namespace: default
+spec:
+  template:
+    spec:
+      ami:
+        id: ami-03714b1bf6617a560
+      iamInstanceProfile: nodes.tkg.cloud.vmware.com
+      instanceType: m5.large
+      rootVolume:
+        size: 80
+      sshKeyName: default-aws
+---
+apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+kind: KubeadmConfigTemplate
+metadata:
+  name: prowa-service-md-0
+  namespace: default
+spec:
+  template:
+    spec:
+      joinConfiguration:
+        nodeRegistration:
+          kubeletExtraArgs:
+            cloud-provider: aws
+            tls-cipher-suites: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+          name: '{{ ds.meta_data.local_hostname }}'
+      useExperimentalRetryJoin: true
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachineDeployment
+metadata:
+  annotations:
+    cluster.k8s.io/cluster-api-autoscaler-node-group-max-size: "12"
+    cluster.k8s.io/cluster-api-autoscaler-node-group-min-size: "1"
+  name: prowa-service-md-0
+  namespace: default
+spec:
+  clusterName: prowa-service
+  replicas: 1
+  selector:
+    matchLabels: null
+  template:
+    metadata:
+      labels:
+        node-pool: prowa-service-worker-pool
+    spec:
+      bootstrap:
+        configRef:
+          apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+          kind: KubeadmConfigTemplate
+          name: prowa-service-md-0
+      clusterName: prowa-service
+      failureDomain: us-east-1a
+      infrastructureRef:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+        kind: AWSMachineTemplate
+        name: prowa-service-md-0
+      version: v1.22.8+vmware.1
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachineDeployment
+metadata:
+  annotations:
+    cluster.k8s.io/cluster-api-autoscaler-node-group-max-size: "12"
+    cluster.k8s.io/cluster-api-autoscaler-node-group-min-size: "1"
+  name: prowa-service-md-1
+  namespace: default
+spec:
+  clusterName: prowa-service
+  replicas: 1
+  selector:
+    matchLabels: null
+  template:
+    metadata:
+      labels:
+        node-pool: prowa-service-worker-pool
+    spec:
+      bootstrap:
+        configRef:
+          apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+          kind: KubeadmConfigTemplate
+          name: prowa-service-md-1
+      clusterName: prowa-service
+      failureDomain: us-east-1b
+      infrastructureRef:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+        kind: AWSMachineTemplate
+        name: prowa-service-md-1
+      version: v1.22.8+vmware.1
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachineDeployment
+metadata:
+  annotations:
+    cluster.k8s.io/cluster-api-autoscaler-node-group-max-size: "12"
+    cluster.k8s.io/cluster-api-autoscaler-node-group-min-size: "1"
+  name: prowa-service-md-2
+  namespace: default
+spec:
+  clusterName: prowa-service
+  replicas: 1
+  selector:
+    matchLabels: null
+  template:
+    metadata:
+      labels:
+        node-pool: prowa-service-worker-pool
+    spec:
+      bootstrap:
+        configRef:
+          apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+          kind: KubeadmConfigTemplate
+          name: prowa-service-md-2
+      clusterName: prowa-service
+      failureDomain: us-east-1c
+      infrastructureRef:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+        kind: AWSMachineTemplate
+        name: prowa-service-md-2
+      version: v1.22.8+vmware.1
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: AWSMachineTemplate
+metadata:
+  name: prowa-service-md-1
+  namespace: default
+spec:
+  template:
+    spec:
+      ami:
+        id: ami-03714b1bf6617a560
+      iamInstanceProfile: nodes.tkg.cloud.vmware.com
+      instanceType: ${NODE_MACHINE_TYPE}
+      rootVolume:
+        size: 80
+      sshKeyName: default-aws
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1beta1
+kind: AWSMachineTemplate
+metadata:
+  name: prowa-service-md-2
+  namespace: default
+spec:
+  template:
+    spec:
+      ami:
+        id: ami-03714b1bf6617a560
+      iamInstanceProfile: nodes.tkg.cloud.vmware.com
+      instanceType: ${NODE_MACHINE_TYPE}
+      rootVolume:
+        size: 80
+      sshKeyName: default-aws
+---
+apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+kind: KubeadmConfigTemplate
+metadata:
+  name: prowa-service-md-1
+  namespace: default
+spec:
+  template:
+    spec:
+      joinConfiguration:
+        nodeRegistration:
+          kubeletExtraArgs:
+            cloud-provider: aws
+          name: '{{ ds.meta_data.local_hostname }}'
+---
+apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+kind: KubeadmConfigTemplate
+metadata:
+  name: prowa-service-md-2
+  namespace: default
+spec:
+  template:
+    spec:
+      joinConfiguration:
+        nodeRegistration:
+          kubeletExtraArgs:
+            cloud-provider: aws
+          name: '{{ ds.meta_data.local_hostname }}'
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  annotations:
+    tkg.tanzu.vmware.com/addon-type: cni/antrea
+  labels:
+    clusterctl.cluster.x-k8s.io/move: ""
+    tkg.tanzu.vmware.com/addon-name: antrea
+    tkg.tanzu.vmware.com/cluster-name: prowa-service
+  name: prowa-service-antrea-addon
+  namespace: default
+stringData:
+  values.yaml: |
+    #@data/values
+    #@overlay/match-child-defaults missing_ok=True
+    ---
+    infraProvider: aws
+    antrea:
+      config:
+        serviceCIDR: 100.64.0.0/13
+        trafficEncapMode: encap
+        noSNAT: false
+        tlsCipherSuites: TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,TLS_RSA_WITH_AES_256_GCM_SHA384
+        disableUdpTunnelOffload: false
+        featureGates:
+          AntreaProxy: true
+          EndpointSlice: false
+          AntreaPolicy: true
+          NodePortLocal: false
+          AntreaTraceflow: true
+      image:
+        repository: projects-stg.registry.vmware.com/tkg
+        path: antrea-standard-debian
+        tag: v1.2.3_vmware.4
+        pullPolicy: IfNotPresent
+type: tkg.tanzu.vmware.com/addon
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  annotations:
+    tkg.tanzu.vmware.com/addon-type: addons-management/kapp-controller
+    tkg.tanzu.vmware.com/remote-app: "true"
+  labels:
+    clusterctl.cluster.x-k8s.io/move: ""
+    tkg.tanzu.vmware.com/addon-name: kapp-controller
+    tkg.tanzu.vmware.com/cluster-name: prowa-service
+  name: prowa-service-kapp-controller-addon
+  namespace: default
+stringData:
+  values.yaml: |
+    #@data/values
+    #@overlay/match-child-defaults missing_ok=True
+    ---
+    kappController:
+      namespace: tkg-system
+      createNamespace: true
+      globalNamespace: tanzu-package-repo-global
+      image:
+        repository: projects-stg.registry.vmware.com/tkg
+        path: kapp-controller
+        tag: v0.30.1_vmware.1
+        pullPolicy: IfNotPresent
+      deployment:
+        concurrency: 4
+        coreDNSIP: 100.64.0.10
+        hostNetwork: true
+        priorityClassName: system-cluster-critical
+        apiPort: 10100
+        metricsBindAddress: "0"
+        tolerations:
+        - key: CriticalAddonsOnly
+          operator: Exists
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+        - effect: NoSchedule
+          key: node.kubernetes.io/not-ready
+        - effect: NoSchedule
+          key: node.cloudprovider.kubernetes.io/uninitialized
+          value: "true"
+      config: {}
+type: tkg.tanzu.vmware.com/addon
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  annotations:
+    tkg.tanzu.vmware.com/addon-type: metadata/tkg
+  name: prowa-service-tkg-metadata-namespace-role
+  namespace: default
+stringData:
+  value: |
+    apiVersion: v1
+    kind: Namespace
+    metadata:
+      name: tkg-system-public
+      annotations:
+        tkg.tanzu.vmware.com/addon-type: metadata/tkg
+    ---
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: Role
+    metadata:
+      name: tkg-metadata-reader
+      namespace: tkg-system-public
+      annotations:
+        tkg.tanzu.vmware.com/addon-type: metadata/tkg
+    rules:
+    - apiGroups:
+      - ""
+      resourceNames:
+      - tkg-metadata
+      - tkg-bom
+      resources:
+      - configmaps
+      verbs:
+      - get
+      - list
+      - watch
+    ---
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: RoleBinding
+    metadata:
+      name: tkg-metadata-reader
+      namespace: tkg-system-public
+      annotations:
+        tkg.tanzu.vmware.com/addon-type: metadata/tkg
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: Role
+      name: tkg-metadata-reader
+    subjects:
+    - apiGroup: rbac.authorization.k8s.io
+      kind: Group
+      name: system:authenticated
+type: addons.cluster.x-k8s.io/resource-set
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  annotations:
+    tkg.tanzu.vmware.com/addon-type: metadata/tkg
+  name: prowa-service-tkg-metadata-configmap
+  namespace: default
+stringData:
+  value: |
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: tkg-metadata
+      namespace: tkg-system-public
+      annotations:
+        tkg.tanzu.vmware.com/addon-type: metadata/tkg
+    data:
+      metadata.yaml: |
+        cluster:
+          name: prowa-service
+          type: workload
+          plan: prod
+          kubernetesProvider: VMware Tanzu Kubernetes Grid
+          tkgVersion: v1.5.3-tf-v0.11.4
+          edition: tce
+          infrastructure:
+            provider: aws
+        bom:
+          configmapRef:
+            name: tkg-bom
+type: addons.cluster.x-k8s.io/resource-set
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  annotations:
+    tkg.tanzu.vmware.com/addon-type: metadata/tkg
+  name: prowa-service-tkg-metadata-bom-configmap
+  namespace: default
+stringData:
+  value: |
+    apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: tkg-bom
+      namespace: tkg-system-public
+      annotations:
+        tkg.tanzu.vmware.com/addon-type: metadata/tkg
+    data:
+      bom.yaml: |
+        apiVersion: run.tanzu.vmware.com/v1alpha2
+        default:
+          k8sVersion: v1.22.8+vmware.1-tkg.1-tf-v0.11.4
+        release:
+          version: v1.5.3-tf-v0.11.4
+        components:
+          aad-pod-identity:
+          - version: v1.8.0+vmware.1
+            images:
+              micImage:
+                imagePath: cluster-api/mic
+                tag: v1.8.0_vmware.1
+              nmiImage:
+                imagePath: cluster-api/nmi
+                tag: v1.8.0_vmware.1
+          alertmanager:
+          - version: v0.22.2+vmware.1
+            images:
+              alertmanagerImage:
+                imagePath: prometheus/alertmanager
+                tag: v0.22.2_vmware.1
+          cadvisor:
+          - version: v0.39.1+vmware.1
+            images:
+              cadvisorImage:
+                imagePath: prometheus/cadvisor
+                tag: v0.39.1_vmware.1
+          cloud-provider-azure:
+          - version: v0.7.4+vmware.1
+            images:
+              ccmAzureControllerImage:
+                imagePath: azure-cloud-controller-manager
+                tag: v0.7.4_vmware.1
+              ccmAzureNodeImage:
+                imagePath: azure-cloud-node-manager
+                tag: v0.7.4_vmware.1
+          cluster-api-provider-azure:
+          - version: v1.0.2+vmware.1
+            images:
+              capzControllerImage:
+                imagePath: cluster-api/cluster-api-azure-controller
+                tag: v1.0.2_vmware.1
+          cluster-api-provider-bringyourownhost:
+          - version: v0.1.0+vmware.5
+            images:
+              byohControllerImage:
+                imagePath: cluster-api/cluster-api-byoh-controller
+                tag: v0.1.0_vmware.5
+              byohImgpkgBundle:
+                imagePath: cluster-api/byoh-bundle-ubuntu_20.04.1_x86-64_k8s_v1.22.3
+                tag: v0.1.0_vmware.5
+          cluster_api:
+          - version: v1.0.1+vmware.1
+            images:
+              cabpkControllerImage:
+                imagePath: cluster-api/kubeadm-bootstrap-controller
+                tag: v1.0.1_vmware.1
+              capdManagerImage:
+                imagePath: cluster-api/capd-manager
+                tag: v1.0.1_vmware.1
+              capiControllerImage:
+                imagePath: cluster-api/cluster-api-controller
+                tag: v1.0.1_vmware.1
+              kcpControllerImage:
+                imagePath: cluster-api/kubeadm-control-plane-controller
+                tag: v1.0.1_vmware.1
+          cluster_api_aws:
+          - version: v1.2.0+vmware.1
+            images:
+              capaControllerImage:
+                imagePath: cluster-api/cluster-api-aws-controller
+                tag: v1.2.0_vmware.1
+          cluster_api_vsphere:
+          - version: v1.0.3+vmware.1
+            images:
+              capvControllerImage:
+                imagePath: cluster-api/cluster-api-vsphere-controller
+                tag: v1.0.3_vmware.1
+          configmap-reload:
+          - version: v0.5.0+vmware.2
+            images:
+              configmapReloadImage:
+                imagePath: prometheus/configmap-reload
+                tag: v0.5.0_vmware.2
+          contour:
+          - version: v1.17.2+vmware.1
+            images:
+              contourImage:
+                imagePath: contour
+                tag: v1.17.2_vmware.1
+          - version: v1.18.2+vmware.1
+            images:
+              contourImage:
+                imagePath: contour
+                tag: v1.18.2_vmware.1
+          crash-diagnostics:
+          - version: v0.3.7+vmware.5
+          envoy:
+          - version: v1.18.4+vmware.1
+            images:
+              envoyImage:
+                imagePath: envoy
+                tag: v1.18.4_vmware.1
+          - version: v1.19.1+vmware.1
+            images:
+              envoyImage:
+                imagePath: envoy
+                tag: v1.19.1_vmware.1
+          external-dns:
+          - version: v0.10.0+vmware.1
+            images:
+              externalDNSImage:
+                imagePath: external-dns
+                tag: v0.10.0_vmware.1
+          fluent-bit:
+          - version: v1.7.5+vmware.2
+            images:
+              fluentBitImage:
+                imagePath: fluent-bit
+                tag: v1.7.5_vmware.2
+          gangway:
+          - version: v3.2.0+vmware.2
+            images:
+              gangwayImage:
+                imagePath: gangway
+                tag: v3.2.0_vmware.2
+          grafana:
+          - version: v7.5.7+vmware.2
+            images:
+              grafanaImage:
+                imagePath: grafana/grafana
+                tag: v7.5.7_vmware.2
+          harbor:
+          - version: v2.3.3+vmware.1
+            images:
+              harborChartMuseumImage:
+                imagePath: harbor/chartmuseum-photon
+                tag: v2.3.3_vmware.1
+              harborCoreImage:
+                imagePath: harbor/harbor-core
+                tag: v2.3.3_vmware.1
+              harborDatabaseImage:
+                imagePath: harbor/harbor-db
+                tag: v2.3.3_vmware.1
+              harborExporterImage:
+                imagePath: harbor/harbor-exporter
+                tag: v2.3.3_vmware.1
+              harborJobServiceImage:
+                imagePath: harbor/harbor-jobservice
+                tag: v2.3.3_vmware.1
+              harborLogImage:
+                imagePath: harbor/harbor-log
+                tag: v2.3.3_vmware.1
+              harborNginxImage:
+                imagePath: harbor/nginx-photon
+                tag: v2.3.3_vmware.1
+              harborNotaryServerImage:
+                imagePath: harbor/notary-server-photon
+                tag: v2.3.3_vmware.1
+              harborNotarySignerImage:
+                imagePath: harbor/notary-signer-photon
+                tag: v2.3.3_vmware.1
+              harborPortalImage:
+                imagePath: harbor/harbor-portal
+                tag: v2.3.3_vmware.1
+              harborPrepareImage:
+                imagePath: harbor/prepare
+                tag: v2.3.3_vmware.1
+              harborRedisImage:
+                imagePath: harbor/redis-photon
+                tag: v2.3.3_vmware.1
+              harborRegistryCtlImage:
+                imagePath: harbor/harbor-registryctl
+                tag: v2.3.3_vmware.1
+              harborRegistryImage:
+                imagePath: harbor/registry-photon
+                tag: v2.3.3_vmware.1
+              harborTrivyAdapterImage:
+                imagePath: harbor/trivy-adapter-photon
+                tag: v2.3.3_vmware.1
+          image-builder:
+          - version: v0.1.11+vmware.3
+            images:
+              imagebuilder-tar:
+                imagePath: image-builder
+                tag: v0.1.11_vmware.3
+          imgpkg:
+          - version: v0.22.0+vmware.1
+          jetstack_cert-manager:
+          - version: v1.5.3+vmware.2
+            images:
+              certMgrControllerImage:
+                imagePath: cert-manager-controller
+                tag: v1.5.3_vmware.2
+              certMgrInjectorImage:
+                imagePath: cert-manager-cainjector
+                tag: v1.5.3_vmware.2
+              certMgrWebhookImage:
+                imagePath: cert-manager-webhook
+                tag: v1.5.3_vmware.2
+          k8s-sidecar:
+          - version: v1.12.1+vmware.2
+            images:
+              k8sSidecarImage:
+                imagePath: grafana/k8s-sidecar
+                tag: v1.12.1_vmware.2
+          k14s_kapp:
+          - version: v0.42.0+vmware.2
+          k14s_ytt:
+          - version: v0.37.0+vmware.1
+          kbld:
+          - version: v0.31.0+vmware.1
+          kube-state-metrics:
+          - version: v1.9.8+vmware.1
+            images:
+              kubeStateMetricsImage:
+                imagePath: prometheus/kube-state-metrics
+                tag: v1.9.8_vmware.1
+          kube-vip:
+          - version: v0.3.3+vmware.1
+            images:
+              kubeVipImage:
+                imagePath: kube-vip
+                tag: v0.3.3_vmware.1
+          kube_rbac_proxy:
+          - version: v0.8.0+vmware.1
+            images:
+              kubeRbacProxyControllerImage:
+                imagePath: kube-rbac-proxy
+                tag: v0.8.0_vmware.1
+              kubeRbacProxyControllerImageCapi:
+                imagePath: cluster-api/kube-rbac-proxy
+                tag: v0.8.0_vmware.1
+          kubernetes-sigs_kind:
+          - version: v1.22.8+vmware.1-tkg.1_v0.11.1
+            images:
+              kindNodeImage:
+                imagePath: kind/node
+                tag: v1.22.8_vmware.1-tkg.1_v0.11.1
+          kubernetes_autoscaler:
+          - version: v1.22.0+vmware.1
+            images:
+              kubernetesAutoscalerImage:
+                imagePath: cluster-autoscaler
+                tag: v1.22.0_vmware.1
+            metadata:
+              k8sversion: v1.22.3+vmware.1
+          - version: v1.21.0+vmware.1
+            images:
+              kubernetesAutoscalerImage:
+                imagePath: cluster-autoscaler
+                tag: v1.21.0_vmware.1
+            metadata:
+              k8sversion: v1.21.1+vmware.1
+          - version: v1.20.0+vmware.1
+            images:
+              kubernetesAutoscalerImage:
+                imagePath: cluster-autoscaler
+                tag: v1.20.0_vmware.1
+            metadata:
+              k8sversion: v1.20.4+vmware.1
+          multus-cni:
+          - version: v3.7.1+vmware.2
+            images:
+              multusCniImage:
+                imagePath: multus-cni
+                tag: v3.7.1_vmware.2
+          prometheus:
+          - version: v2.27.0+vmware.1
+            images:
+              prometheusImage:
+                imagePath: prometheus/prometheus
+                tag: v2.27.0_vmware.1
+          prometheus_node_exporter:
+          - version: v1.1.2+vmware.1
+            images:
+              prometheusNodeExporterImage:
+                imagePath: prometheus/prometheus_node_exporter
+                tag: v1.1.2_vmware.1
+          pushgateway:
+          - version: v1.4.0+vmware.1
+            images:
+              pushgatewayImage:
+                imagePath: prometheus/pushgateway
+                tag: v1.4.0_vmware.1
+          sonobuoy:
+          - version: v0.54.0+vmware.1
+            images:
+              sonobuoyImage:
+                imagePath: sonobuoy
+                tag: v0.54.0_vmware.1
+          standalone-plugins-package:
+          - version: v0.11.4-tf-standalone-plugins
+            images:
+              standalone-plugins.tanzu.vmware.com:
+                imagePath: packages/standalone/standalone-plugins
+                tag: v0.11.4-tf_vmware.1
+          tanzu-framework:
+          - version: v0.11.4-tf
+            images:
+              capabilitiesImage:
+                imagePath: tanzu_core/capabilities/capabilities-controller-manager
+                tag: v0.11.4-tf
+              clipluginsClusterDarwinAmd64Image:
+                imagePath: tanzu_core/tanzu-cli-plugins/cluster-darwin-amd64
+                tag: v0.11.4-tf
+              clipluginsClusterLinuxAmd64Image:
+                imagePath: tanzu_core/tanzu-cli-plugins/cluster-linux-amd64
+                tag: v0.11.4-tf
+              clipluginsClusterWindowsAmd64Image:
+                imagePath: tanzu_core/tanzu-cli-plugins/cluster-windows-amd64
+                tag: v0.11.4-tf
+              clipluginsKubernetesReleaseDarwinAmd64Image:
+                imagePath: tanzu_core/tanzu-cli-plugins/kubernetes-release-darwin-amd64
+                tag: v0.11.4-tf
+              clipluginsKubernetesReleaseLinuxAmd64Image:
+                imagePath: tanzu_core/tanzu-cli-plugins/kubernetes-release-linux-amd64
+                tag: v0.11.4-tf
+              clipluginsKubernetesReleaseWindowsAmd64Image:
+                imagePath: tanzu_core/tanzu-cli-plugins/kubernetes-release-windows-amd64
+                tag: v0.11.4-tf
+              clipluginsLoginDarwinAmd64Image:
+                imagePath: tanzu_core/tanzu-cli-plugins/login-darwin-amd64
+                tag: v0.11.4-tf
+              clipluginsLoginLinuxAmd64Image:
+                imagePath: tanzu_core/tanzu-cli-plugins/login-linux-amd64
+                tag: v0.11.4-tf
+              clipluginsLoginWindowsAmd64Image:
+                imagePath: tanzu_core/tanzu-cli-plugins/login-windows-amd64
+                tag: v0.11.4-tf
+              clipluginsManagementClusterDarwinAmd64Image:
+                imagePath: tanzu_core/tanzu-cli-plugins/management-cluster-darwin-amd64
+                tag: v0.11.4-tf
+              clipluginsManagementClusterLinuxAmd64Image:
+                imagePath: tanzu_core/tanzu-cli-plugins/management-cluster-linux-amd64
+                tag: v0.11.4-tf
+              clipluginsManagementClusterWindowsAmd64Image:
+                imagePath: tanzu_core/tanzu-cli-plugins/management-cluster-windows-amd64
+                tag: v0.11.4-tf
+              clipluginsPackageDarwinAmd64Image:
+                imagePath: tanzu_core/tanzu-cli-plugins/package-darwin-amd64
+                tag: v0.11.4-tf
+              clipluginsPackageLinuxAmd64Image:
+                imagePath: tanzu_core/tanzu-cli-plugins/package-linux-amd64
+                tag: v0.11.4-tf
+              clipluginsPackageWindowsAmd64Image:
+                imagePath: tanzu_core/tanzu-cli-plugins/package-windows-amd64
+                tag: v0.11.4-tf
+              clipluginsPinnipedAuthDarwinAmd64Image:
+                imagePath: tanzu_core/tanzu-cli-plugins/pinniped-auth-darwin-amd64
+                tag: v0.11.4-tf
+              clipluginsPinnipedAuthLinuxAmd64Image:
+                imagePath: tanzu_core/tanzu-cli-plugins/pinniped-auth-linux-amd64
+                tag: v0.11.4-tf
+              clipluginsPinnipedAuthWindowsAmd64Image:
+                imagePath: tanzu_core/tanzu-cli-plugins/pinniped-auth-windows-amd64
+                tag: v0.11.4-tf
+              clipluginsSecretDarwinAmd64Image:
+                imagePath: tanzu_core/tanzu-cli-plugins/secret-darwin-amd64
+                tag: v0.11.4-tf
+              clipluginsSecretLinuxAmd64Image:
+                imagePath: tanzu_core/tanzu-cli-plugins/secret-linux-amd64
+                tag: v0.11.4-tf
+              clipluginsSecretWindowsAmd64Image:
+                imagePath: tanzu_core/tanzu-cli-plugins/secret-windows-amd64
+                tag: v0.11.4-tf
+              featuregatesImage:
+                imagePath: tanzu_core/featuregates/featuregates-controller-manager
+                tag: v0.11.4-tf
+              providerTemplateImage:
+                imagePath: tanzu_core/provider/provider-templates
+                tag: v0.11.4-tf
+              tkrImage:
+                imagePath: tanzu_core/tkr/tkr-controller-manager
+                tag: v0.11.4-tf
+          tanzu-framework-management-packages:
+          - version: v0.11.4-tf
+            images:
+              tanzuFrameworkManagementPackageRepositoryImage:
+                imagePath: packages/management/repo
+                tag: v0.11.4-tf
+          tkg-bom:
+          - version: v1.5.3-tf-v0.11.4
+            images:
+              tkgBomImage:
+                imagePath: tkg-bom
+                tag: v1.5.3-tf-v0.11.4
+          tkg-standard-packages:
+          - version: v1.5.3-tf-v0.11.4
+            images:
+              tanzuStandardPackageRepositoryImage:
+                imagePath: packages/standard/repo
+                tag: v1.5.3-tf-v0.11.4
+          tkg_telemetry:
+          - version: v1.5.0+vmware.1
+            images:
+              tkgTelemetryImage:
+                imagePath: tkg-telemetry
+                tag: v1.5.0_vmware.1
+          velero:
+          - version: v1.7.0+vmware.1
+            images:
+              veleroImage:
+                imagePath: velero/velero
+                tag: v1.7.0_vmware.1
+              veleroResticRestoreHelperImage:
+                imagePath: velero/velero-restic-restore-helper
+                tag: v1.7.0_vmware.1
+          velero-plugin-for-aws:
+          - version: v1.3.0+vmware.1
+            images:
+              veleroPluginForAwsImage:
+                imagePath: velero/velero-plugin-for-aws
+                tag: v1.3.0_vmware.1
+          velero-plugin-for-microsoft-azure:
+          - version: v1.3.0+vmware.1
+            images:
+              veleroPluginForMicrosoftAzureImage:
+                imagePath: velero/velero-plugin-for-microsoft-azure
+                tag: v1.3.0_vmware.1
+          velero-plugin-for-vsphere:
+          - version: v1.3.0+vmware.1
+            images:
+              veleroBackupDriverImage:
+                imagePath: velero/backup-driver
+                tag: v1.3.0_vmware.1
+              veleroDataManagerForPluginImage:
+                imagePath: velero/data-manager-for-plugin
+                tag: v1.3.0_vmware.1
+              veleroPluginForVsphereImage:
+                imagePath: velero/velero-plugin-for-vsphere
+                tag: v1.3.0_vmware.1
+          vendir:
+          - version: v0.23.1+vmware.1
+        kindKubeadmConfigSpec:
+        - 'kind: Cluster'
+        - 'apiVersion: kind.x-k8s.io/v1alpha4'
+        - 'kubeadmConfigPatches:'
+        - '- |'
+        - '  apiVersion: kubeadm.k8s.io/v1beta2'
+        - '  kind: ClusterConfiguration'
+        - '  imageRepository: projects.registry.vmware.com/tkg'
+        - '  etcd:'
+        - '    local:'
+        - '      imageRepository: projects.registry.vmware.com/tkg'
+        - '      imageTag: v3.5.2_vmware.3'
+        - '  dns:'
+        - '    type: CoreDNS'
+        - '    imageRepository: projects.registry.vmware.com/tkg'
+        - '    imageTag: v1.8.4_vmware.9'
+        imageConfig:
+          imageRepository: projects-stg.registry.vmware.com/tkg
+        tkr-bom:
+          imagePath: tkr-bom
+        tkr-compatibility:
+          imagePath: framework-zshippable/tkr-compatibility
+type: addons.cluster.x-k8s.io/resource-set
+---
+apiVersion: addons.cluster.x-k8s.io/v1beta1
+kind: ClusterResourceSet
+metadata:
+  annotations:
+    tkg.tanzu.vmware.com/addon-type: metadata/tkg
+  labels:
+    cluster.x-k8s.io/cluster-name: prowa-service
+  name: prowa-service-tkg-metadata
+  namespace: default
+spec:
+  clusterSelector:
+    matchLabels:
+      tkg.tanzu.vmware.com/cluster-name: prowa-service
+  resources:
+  - kind: Secret
+    name: prowa-service-tkg-metadata-namespace-role
+  - kind: Secret
+    name: prowa-service-tkg-metadata-configmap
+  - kind: Secret
+    name: prowa-service-tkg-metadata-bom-configmap
+  strategy: ApplyOnce
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  annotations:
+    tkg.tanzu.vmware.com/addon-type: metrics/metrics-server
+  labels:
+    clusterctl.cluster.x-k8s.io/move: ""
+    tkg.tanzu.vmware.com/addon-name: metrics-server
+    tkg.tanzu.vmware.com/cluster-name: prowa-service
+  name: prowa-service-metrics-server-addon
+  namespace: default
+stringData:
+  values.yaml: |
+    #@data/values
+    #@overlay/match-child-defaults missing_ok=True
+    ---
+    metricsServer:
+      namespace: kube-system
+      config:
+        args: []
+        probe:
+          failureThreshold: 3
+          periodSeconds: 10
+        apiServiceInsecureTLS: true
+      image:
+        name: metrics-server
+        tag: v0.5.1_vmware.1
+        repository: projects-stg.registry.vmware.com/tkg
+        pullPolicy: IfNotPresent
+type: tkg.tanzu.vmware.com/addon
+---
+apiVersion: addons.cluster.x-k8s.io/v1beta1
+kind: ClusterResourceSet
+metadata:
+  annotations:
+    tkg.tanzu.vmware.com/addon-type: addons-management/core-package-repo
+  labels:
+    cluster.x-k8s.io/cluster-name: prowa-service
+  name: prowa-service-core-package-repository
+  namespace: default
+spec:
+  clusterSelector:
+    matchLabels:
+      tkg.tanzu.vmware.com/cluster-name: prowa-service
+  resources:
+  - kind: Secret
+    name: prowa-service-core-package-repository-crs
+  strategy: ApplyOnce
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  annotations:
+    tkg.tanzu.vmware.com/addon-type: addons-management/core-package-repo
+  name: prowa-service-core-package-repository-crs
+  namespace: default
+stringData:
+  value: |
+    apiVersion: packaging.carvel.dev/v1alpha1
+    kind: PackageRepository
+    metadata:
+      name: tanzu-core
+      namespace: tkg-system
+      annotations:
+        tkg.tanzu.vmware.com/addon-type: addons-management/core-package-repo
+    spec:
+      fetch:
+        imgpkgBundle:
+          image: projects-stg.registry.vmware.com/tkg/packages/core/repo:v1.22.8_vmware.1-tkg.1-tf-v0.11.4
+type: addons.cluster.x-k8s.io/resource-set
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  annotations:
+    tkg.tanzu.vmware.com/addon-type: addons-management/secretgen-controller
+  labels:
+    tkg.tanzu.vmware.com/addon-name: secretgen-controller
+    tkg.tanzu.vmware.com/cluster-name: prowa-service
+  name: prowa-service-secretgen-controller-addon
+  namespace: default
+stringData:
+  values.yaml: |
+    #@data/values
+    #@overlay/match-child-defaults missing_ok=True
+    ---
+    secretgenController:
+      namespace: tanzu-system
+      createNamespace: true
+type: tkg.tanzu.vmware.com/addon
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachineHealthCheck
+metadata:
+  name: prowa-service
+  namespace: default
+spec:
+  clusterName: prowa-service
+  nodeStartupTimeout: 20m
+  selector:
+    matchLabels:
+      node-pool: prowa-service-worker-pool
+  unhealthyConditions:
+  - status: Unknown
+    timeout: 5m
+    type: Ready
+  - status: "False"
+    timeout: 12m
+    type: Ready
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachineHealthCheck
+metadata:
+  name: prowa-service-control-plane
+  namespace: default
+spec:
+  clusterName: prowa-service
+  nodeStartupTimeout: 20m
+  selector:
+    matchLabels:
+      cluster.x-k8s.io/control-plane: ""
+  unhealthyConditions:
+  - status: Unknown
+    timeout: 5m
+    type: Ready
+  - status: "False"
+    timeout: 12m
+    type: Ready
+---
+apiVersion: addons.cluster.x-k8s.io/v1beta1
+kind: ClusterResourceSet
+metadata:
+  labels:
+    cluster.x-k8s.io/cluster-name: prowa-service
+  name: prowa-service-default-storage-class
+  namespace: default
+spec:
+  clusterSelector:
+    matchLabels:
+      tkg.tanzu.vmware.com/cluster-name: prowa-service
+  resources:
+  - kind: Secret
+    name: prowa-service-default-storage-class
+  strategy: ApplyOnce
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: prowa-service-default-storage-class
+  namespace: default
+stringData:
+  value: |
+    kind: StorageClass
+    apiVersion: storage.k8s.io/v1
+    metadata:
+      name: default
+      annotations:
+        storageclass.kubernetes.io/is-default-class: "true"
+    provisioner: kubernetes.io/aws-ebs
+    allowVolumeExpansion: true
+type: addons.cluster.x-k8s.io/resource-set
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: prowa-service-cluster-autoscaler
+  name: prowa-service-cluster-autoscaler
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prowa-service-cluster-autoscaler
+  template:
+    metadata:
+      labels:
+        app: prowa-service-cluster-autoscaler
+    spec:
+      containers:
+      - args:
+        - --cloud-provider=clusterapi
+        - --v=4
+        - --clusterapi-cloud-config-authoritative
+        - --kubeconfig=/mnt/prowa-service-kubeconfig/value
+        - --node-group-auto-discovery=clusterapi:clusterName=prowa-service
+        - --scale-down-delay-after-add=10m
+        - --scale-down-delay-after-delete=10s
+        - --scale-down-delay-after-failure=3m
+        - --scale-down-unneeded-time=10m
+        - --max-node-provision-time=15m
+        - --max-nodes-total=39
+        command:
+        - /cluster-autoscaler
+        image: projects-stg.registry.vmware.com/tkg/cluster-autoscaler:v1.22.0_vmware.1
+        name: prowa-service-cluster-autoscaler
+        volumeMounts:
+        - mountPath: /mnt/prowa-service-kubeconfig
+          name: prowa-service-cluster-autoscaler-volume
+          readOnly: true
+      serviceAccountName: prowa-service-autoscaler
+      terminationGracePeriodSeconds: 10
+      tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/master
+      volumes:
+      - name: prowa-service-cluster-autoscaler-volume
+        secret:
+          secretName: prowa-service-kubeconfig
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: prowa-service-autoscaler-workload
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-autoscaler-workload
+subjects:
+- kind: ServiceAccount
+  name: prowa-service-autoscaler
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: prowa-service-autoscaler-management
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-autoscaler-management
+subjects:
+- kind: ServiceAccount
+  name: prowa-service-autoscaler
+  namespace: default
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: prowa-service-autoscaler
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cluster-autoscaler-workload
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - persistentvolumeclaims
+  - persistentvolumes
+  - pods
+  - replicationcontrollers
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  verbs:
+  - get
+  - list
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - pods/eviction
+  verbs:
+  - create
+- apiGroups:
+  - policy
+  resources:
+  - poddisruptionbudgets
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - storage.k8s.io
+  resources:
+  - csinodes
+  - storageclasses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - batch
+  resources:
+  - jobs
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - daemonsets
+  - replicasets
+  - statefulsets
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - create
+  - delete
+  - get
+  - update
+- apiGroups:
+  - coordination.k8s.io
+  resources:
+  - leases
+  verbs:
+  - create
+  - get
+  - update
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cluster-autoscaler-management
+rules:
+- apiGroups:
+  - cluster.x-k8s.io
+  resources:
+  - machinedeployments
+  - machines
+  - machinesets
+  verbs:
+  - get
+  - list
+  - update
+  - watch
+  - patch
+- apiGroups:
+  - cluster.x-k8s.io
+  resources:
+  - machinedeployments/scale
+  - machinesets/scale
+  verbs:
+  - get
+  - update
+---
+apiVersion: addons.cluster.x-k8s.io/v1beta1
+kind: ClusterResourceSet
+metadata:
+  annotations:
+    tkg.tanzu.vmware.com/addon-type: capabilities/capabilities-controller
+  labels:
+    cluster.x-k8s.io/cluster-name: prowa-service
+  name: prowa-service-capabilities
+  namespace: default
+spec:
+  clusterSelector:
+    matchLabels:
+      tkg.tanzu.vmware.com/cluster-name: prowa-service
+  resources:
+  - kind: Secret
+    name: prowa-service-capabilities
+  strategy: ApplyOnce
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  annotations:
+    tkg.tanzu.vmware.com/addon-type: capabilities/capabilities-controller
+  name: prowa-service-capabilities
+  namespace: default
+stringData:
+  value: |
+    apiVersion: apiextensions.k8s.io/v1
+    kind: CustomResourceDefinition
+    metadata:
+      annotations:
+        controller-gen.kubebuilder.io/version: v0.7.0
+        tkg.tanzu.vmware.com/addon-type: capabilities/capabilities-controller
+      creationTimestamp: null
+      name: capabilities.run.tanzu.vmware.com
+    spec:
+      group: run.tanzu.vmware.com
+      names:
+        kind: Capability
+        listKind: CapabilityList
+        plural: capabilities
+        singular: capability
+      scope: Namespaced
+      versions:
+      - name: v1alpha1
+        schema:
+          openAPIV3Schema:
+            description: Capability is the Schema for the capabilities API
+            properties:
+              apiVersion:
+                description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+                type: string
+              kind:
+                description: 'Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                type: string
+              metadata:
+                type: object
+              spec:
+                description: Spec is the capability spec that has cluster queries.
+                properties:
+                  queries:
+                    description: Queries specifies set of queries that are evaluated.
+                    items:
+                      description: Query is a logical grouping of GVR, Object and PartialSchema queries.
+                      properties:
+                        groupVersionResources:
+                          description: GroupVersionResources evaluates a slice of GVR queries.
+                          items:
+                            description: QueryGVR queries for an API group with the optional ability to check for API versions and resource.
+                            properties:
+                              group:
+                                description: Group is the API group to check for in the cluster.
+                                minLength: 1
+                                type: string
+                              name:
+                                description: Name is the unique name of the query.
+                                minLength: 1
+                                type: string
+                              resource:
+                                description: Resource is the API resource to check for given an API group and a slice of versions. Specifying a Resource requires at least one version to be specified in Versions.
+                                type: string
+                              versions:
+                                description: Versions is the slice of versions to check for in the specified API group.
+                                items:
+                                  type: string
+                                type: array
+                            required:
+                            - group
+                            - name
+                            type: object
+                          type: array
+                          x-kubernetes-list-map-keys:
+                          - name
+                          x-kubernetes-list-type: map
+                        name:
+                          description: Name is the unique name of the query.
+                          minLength: 1
+                          type: string
+                        objects:
+                          description: Objects evaluates a slice of Object queries.
+                          items:
+                            description: QueryObject represents any runtime.Object that could exist in a cluster with the ability to check for annotations.
+                            properties:
+                              name:
+                                description: Name is the unique name of the query.
+                                minLength: 1
+                                type: string
+                              objectReference:
+                                description: ObjectReference is the ObjectReference to check for in the cluster.
+                                properties:
+                                  apiVersion:
+                                    description: API version of the referent.
+                                    type: string
+                                  fieldPath:
+                                    description: 'If referring to a piece of an object instead of an entire object, this string should contain a valid JSON/Go field access statement, such as desiredState.manifest.containers[2]. For example, if the object reference is to a container within a pod, this would take on a value like: "spec.containers{name}" (where "name" refers to the name of the container that triggered the event) or if no container name is specified "spec.containers[2]" (container with index 2 in this pod). This syntax is chosen only to have some well-defined way of referencing a part of an object. TODO: this design is not final and this field is subject to change in the future.'
+                                    type: string
+                                  kind:
+                                    description: 'Kind of the referent. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+                                    type: string
+                                  name:
+                                    description: 'Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names'
+                                    type: string
+                                  namespace:
+                                    description: 'Namespace of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/namespaces/'
+                                    type: string
+                                  resourceVersion:
+                                    description: 'Specific resourceVersion to which this reference is made, if any. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency'
+                                    type: string
+                                  uid:
+                                    description: 'UID of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#uids'
+                                    type: string
+                                type: object
+                              withAnnotations:
+                                additionalProperties:
+                                  type: string
+                                description: WithAnnotations are the annotations whose presence is checked in the object. The query succeeds only if all the annotations specified exists.
+                                type: object
+                              withoutAnnotations:
+                                additionalProperties:
+                                  type: string
+                                description: WithAnnotations are the annotations whose absence is checked in the object. The query succeeds only if all the annotations specified do not exist.
+                                type: object
+                            required:
+                            - name
+                            - objectReference
+                            type: object
+                          type: array
+                          x-kubernetes-list-map-keys:
+                          - name
+                          x-kubernetes-list-type: map
+                        partialSchemas:
+                          description: PartialSchemas evaluates a slice of PartialSchema queries.
+                          items:
+                            description: QueryPartialSchema queries for any OpenAPI schema that may exist on a cluster.
+                            properties:
+                              name:
+                                description: Name is the unique name of the query.
+                                minLength: 1
+                                type: string
+                              partialSchema:
+                                description: PartialSchema is the partial OpenAPI schema that will be matched in a cluster.
+                                minLength: 1
+                                type: string
+                            required:
+                            - name
+                            - partialSchema
+                            type: object
+                          type: array
+                          x-kubernetes-list-map-keys:
+                          - name
+                          x-kubernetes-list-type: map
+                      required:
+                      - name
+                      type: object
+                    type: array
+                    x-kubernetes-list-map-keys:
+                    - name
+                    x-kubernetes-list-type: map
+                required:
+                - queries
+                type: object
+              status:
+                description: Status is the capability status that has results of cluster queries.
+                properties:
+                  results:
+                    description: Results represents the results of all the queries specified in the spec.
+                    items:
+                      description: Result represents the results of queries in Query.
+                      properties:
+                        groupVersionResources:
+                          description: GroupVersionResources represents results of GVR queries in spec.
+                          items:
+                            description: QueryResult represents the result of a single query.
+                            properties:
+                              error:
+                                description: Error indicates if an error occurred while processing the query.
+                                type: boolean
+                              errorDetail:
+                                description: ErrorDetail represents the error detail, if an error occurred.
+                                type: string
+                              found:
+                                description: Found is a boolean which indicates if the query condition succeeded.
+                                type: boolean
+                              name:
+                                description: Name is the name of the query in spec whose result this struct represents.
+                                minLength: 1
+                                type: string
+                              notFoundReason:
+                                description: NotFoundReason provides the reason if the query condition fails. This is non-empty when Found is false.
+                                type: string
+                            required:
+                            - name
+                            type: object
+                          type: array
+                          x-kubernetes-list-map-keys:
+                          - name
+                          x-kubernetes-list-type: map
+                        name:
+                          description: Name is the unique name of the query.
+                          minLength: 1
+                          type: string
+                        objects:
+                          description: Objects represents results of Object queries in spec.
+                          items:
+                            description: QueryResult represents the result of a single query.
+                            properties:
+                              error:
+                                description: Error indicates if an error occurred while processing the query.
+                                type: boolean
+                              errorDetail:
+                                description: ErrorDetail represents the error detail, if an error occurred.
+                                type: string
+                              found:
+                                description: Found is a boolean which indicates if the query condition succeeded.
+                                type: boolean
+                              name:
+                                description: Name is the name of the query in spec whose result this struct represents.
+                                minLength: 1
+                                type: string
+                              notFoundReason:
+                                description: NotFoundReason provides the reason if the query condition fails. This is non-empty when Found is false.
+                                type: string
+                            required:
+                            - name
+                            type: object
+                          type: array
+                          x-kubernetes-list-map-keys:
+                          - name
+                          x-kubernetes-list-type: map
+                        partialSchemas:
+                          description: PartialSchemas represents results of PartialSchema queries in spec.
+                          items:
+                            description: QueryResult represents the result of a single query.
+                            properties:
+                              error:
+                                description: Error indicates if an error occurred while processing the query.
+                                type: boolean
+                              errorDetail:
+                                description: ErrorDetail represents the error detail, if an error occurred.
+                                type: string
+                              found:
+                                description: Found is a boolean which indicates if the query condition succeeded.
+                                type: boolean
+                              name:
+                                description: Name is the name of the query in spec whose result this struct represents.
+                                minLength: 1
+                                type: string
+                              notFoundReason:
+                                description: NotFoundReason provides the reason if the query condition fails. This is non-empty when Found is false.
+                                type: string
+                            required:
+                            - name
+                            type: object
+                          type: array
+                          x-kubernetes-list-map-keys:
+                          - name
+                          x-kubernetes-list-type: map
+                      required:
+                      - name
+                      type: object
+                    type: array
+                    x-kubernetes-list-map-keys:
+                    - name
+                    x-kubernetes-list-type: map
+                required:
+                - results
+                type: object
+            type: object
+        served: true
+        storage: true
+        subresources:
+          status: {}
+    ---
+    apiVersion: v1
+    kind: ServiceAccount
+    metadata:
+      labels:
+        app: tanzu-capabilities-manager
+      name: tanzu-capabilities-manager-sa
+      namespace: tkg-system
+      annotations:
+        tkg.tanzu.vmware.com/addon-type: capabilities/capabilities-controller
+    ---
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRole
+    metadata:
+      name: tanzu-capabilities-manager-clusterrole
+      annotations:
+        tkg.tanzu.vmware.com/addon-type: capabilities/capabilities-controller
+    rules:
+    - apiGroups:
+      - run.tanzu.vmware.com
+      resources:
+      - capabilities
+      verbs:
+      - create
+      - delete
+      - get
+      - list
+      - patch
+      - update
+      - watch
+    - apiGroups:
+      - run.tanzu.vmware.com
+      resources:
+      - capabilities/status
+      verbs:
+      - get
+      - patch
+      - update
+    - apiGroups:
+      - run.tanzu.vmware.com
+      resources:
+      - tanzukubernetesreleases
+      - tanzukubernetesreleases/status
+      verbs:
+      - get
+      - list
+      - watch
+    - apiGroups:
+      - run.tanzu.vmware.com
+      resources:
+      - tanzukubernetesclusters
+      - tanzukubernetesclusters/status
+      verbs:
+      - get
+      - list
+      - watch
+    - apiGroups:
+      - clusterctl.cluster.x-k8s.io
+      resources:
+      - providers
+      - providers/status
+      verbs:
+      - get
+      - list
+      - watch
+    - apiGroups:
+      - ""
+      resources:
+      - configmaps
+      - namespaces
+      - nodes
+      verbs:
+      - get
+      - list
+      - watch
+    ---
+    apiVersion: rbac.authorization.k8s.io/v1
+    kind: ClusterRoleBinding
+    metadata:
+      name: tanzu-capabilities-manager-clusterrolebinding
+      annotations:
+        tkg.tanzu.vmware.com/addon-type: capabilities/capabilities-controller
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: tanzu-capabilities-manager-clusterrole
+    subjects:
+    - kind: ServiceAccount
+      name: tanzu-capabilities-manager-sa
+      namespace: tkg-system
+    ---
+    apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      labels:
+        app: tanzu-capabilities-manager
+      name: tanzu-capabilities-controller-manager
+      namespace: tkg-system
+      annotations:
+        tkg.tanzu.vmware.com/addon-type: capabilities/capabilities-controller
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: tanzu-capabilities-manager
+      template:
+        metadata:
+          labels:
+            app: tanzu-capabilities-manager
+        spec:
+          containers:
+          - image: projects-stg.registry.vmware.com/tkg/tanzu_core/capabilities/capabilities-controller-manager:v0.11.4-tf
+            imagePullPolicy: IfNotPresent
+            name: manager
+            resources:
+              limits:
+                cpu: 100m
+                memory: 30Mi
+              requests:
+                cpu: 100m
+                memory: 20Mi
+          serviceAccount: tanzu-capabilities-manager-sa
+          terminationGracePeriodSeconds: 10
+          tolerations:
+          - effect: NoSchedule
+            key: node-role.kubernetes.io/master
+type: addons.cluster.x-k8s.io/resource-set
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    clusterctl.cluster.x-k8s.io/move: ""
+    tkg.tanzu.vmware.com/cluster-name: prowa-service
+  name: prowa-service-config-values
+  namespace: default
+stringData:
+  value: |
+    CLUSTER_NAME: prowa-service
+    CLUSTER_PLAN: prod
+    NAMESPACE: default
+    INFRASTRUCTURE_PROVIDER: aws
+    SIZE: null
+    CONTROLPLANE_SIZE: null
+    WORKER_SIZE: null
+    ENABLE_CEIP_PARTICIPATION: false
+    AWS_REGION: us-east-1
+    AWS_NODE_AZ: us-east-1a
+    AWS_NODE_AZ_1: us-east-1b
+    AWS_NODE_AZ_2: us-east-1c
+    AWS_VPC_ID: "vpc-06b3d0152fade8b31"
+    AWS_PRIVATE_SUBNET_ID: subnet-0a5ee2cc286212a87
+    AWS_PUBLIC_SUBNET_ID: subnet-03a6bffe9779fc158
+    AWS_PUBLIC_SUBNET_ID_1: subnet-04553bfd1da51d58b
+    AWS_PRIVATE_SUBNET_ID_1: subnet-0444d1dc6e40269e1
+    AWS_PUBLIC_SUBNET_ID_2: subnet-03d7c318c9bb19fc6
+    AWS_PRIVATE_SUBNET_ID_2: subnet-0cd599591047cb9cf
+    AWS_VPC_CIDR: ""
+    AWS_PRIVATE_NODE_CIDR: ""
+    AWS_PUBLIC_NODE_CIDR: ""
+    AWS_PRIVATE_NODE_CIDR_1: ""
+    AWS_PUBLIC_NODE_CIDR_1: ""
+    AWS_PRIVATE_NODE_CIDR_2: ""
+    AWS_PUBLIC_NODE_CIDR_2: ""
+    AWS_SECURITY_GROUP_APISERVER_LB: ""
+    AWS_SECURITY_GROUP_BASTION: ""
+    AWS_SECURITY_GROUP_CONTROLPLANE: ""
+    AWS_SECURITY_GROUP_LB: ""
+    AWS_SECURITY_GROUP_NODE: ""
+    AWS_IDENTITY_REF_KIND: ""
+    AWS_IDENTITY_REF_NAME: ""
+    AWS_CONTROL_PLANE_OS_DISK_SIZE_GIB: 80
+    AWS_NODE_OS_DISK_SIZE_GIB: 80
+    CONTROL_PLANE_MACHINE_TYPE: m5.large
+    NODE_MACHINE_TYPE: m5.large
+    NODE_MACHINE_TYPE_1: ${NODE_MACHINE_TYPE}
+    NODE_MACHINE_TYPE_2: ${NODE_MACHINE_TYPE}
+    AWS_SSH_KEY_NAME: default-aws
+    BASTION_HOST_ENABLED: true
+    ENABLE_OIDC: false
+    OIDC_ISSUER_URL: null
+    OIDC_USERNAME_CLAIM: null
+    OIDC_GROUPS_CLAIM: null
+    OIDC_DEX_CA: null
+    ENABLE_MHC: true
+    ENABLE_MHC_WORKER_NODE: true
+    ENABLE_MHC_CONTROL_PLANE: true
+    MHC_UNKNOWN_STATUS_TIMEOUT: 5m
+    MHC_FALSE_STATUS_TIMEOUT: 12m
+    TKG_CUSTOM_IMAGE_REPOSITORY: ""
+    TKG_CUSTOM_IMAGE_REPOSITORY_SKIP_TLS_VERIFY: false
+    TKG_CUSTOM_IMAGE_REPOSITORY_CA_CERTIFICATE: ""
+    TKG_HTTP_PROXY: ""
+    TKG_HTTPS_PROXY: ""
+    TKG_NO_PROXY: ""
+    TKG_PROXY_CA_CERT: ""
+    TKG_IP_FAMILY: null
+    ENABLE_AUDIT_LOGGING: ""
+    ENABLE_DEFAULT_STORAGE_CLASS: true
+    CLUSTER_CIDR: 100.96.0.0/11
+    SERVICE_CIDR: 100.64.0.0/13
+    NODE_STARTUP_TIMEOUT: 20m
+    CONTROL_PLANE_MACHINE_COUNT: 3
+    WORKER_MACHINE_COUNT: 1
+    WORKER_MACHINE_COUNT_0: 1
+    WORKER_MACHINE_COUNT_1: 1
+    WORKER_MACHINE_COUNT_2: 1
+    OS_NAME: ubuntu
+    OS_VERSION: 20.04
+    OS_ARCH: amd64
+    ENABLE_AUTOSCALER: true
+    AUTOSCALER_MAX_NODES_TOTAL: 39
+    AUTOSCALER_SCALE_DOWN_DELAY_AFTER_ADD: 10m
+    AUTOSCALER_SCALE_DOWN_DELAY_AFTER_DELETE: 10s
+    AUTOSCALER_SCALE_DOWN_DELAY_AFTER_FAILURE: 3m
+    AUTOSCALER_SCALE_DOWN_UNNEEDED_TIME: 10m
+    AUTOSCALER_MAX_NODE_PROVISION_TIME: 15m
+    AUTOSCALER_MIN_SIZE_0: 1
+    AUTOSCALER_MAX_SIZE_0: 12
+    AUTOSCALER_MIN_SIZE_1: 1
+    AUTOSCALER_MAX_SIZE_1: 12
+    AUTOSCALER_MIN_SIZE_2: 1
+    AUTOSCALER_MAX_SIZE_2: 12
+    IDENTITY_MANAGEMENT_TYPE: none
+    CERT_DURATION: 2160h
+    CERT_RENEW_BEFORE: 360h
+    OIDC_IDENTITY_PROVIDER_NAME: ""
+    OIDC_IDENTITY_PROVIDER_ISSUER_URL: ""
+    OIDC_IDENTITY_PROVIDER_CLIENT_ID: ""
+    OIDC_IDENTITY_PROVIDER_SCOPES: ""
+    OIDC_IDENTITY_PROVIDER_USERNAME_CLAIM: ""
+    OIDC_IDENTITY_PROVIDER_GROUPS_CLAIM: ""
+    SUPERVISOR_ISSUER_URL: null
+    SUPERVISOR_ISSUER_CA_BUNDLE_DATA_B64: null
+    LDAP_BIND_DN: ""
+    LDAP_HOST: ""
+    LDAP_USER_SEARCH_BASE_DN: ""
+    LDAP_USER_SEARCH_FILTER: ""
+    LDAP_USER_SEARCH_USERNAME: userPrincipalName
+    LDAP_USER_SEARCH_ID_ATTRIBUTE: DN
+    LDAP_USER_SEARCH_EMAIL_ATTRIBUTE: DN
+    LDAP_USER_SEARCH_NAME_ATTRIBUTE: ""
+    LDAP_GROUP_SEARCH_BASE_DN: ""
+    LDAP_GROUP_SEARCH_FILTER: ""
+    LDAP_GROUP_SEARCH_USER_ATTRIBUTE: DN
+    LDAP_GROUP_SEARCH_GROUP_ATTRIBUTE: ""
+    LDAP_GROUP_SEARCH_NAME_ATTRIBUTE: cn
+    LDAP_ROOT_CA_DATA_B64: ""
+    ANTREA_NO_SNAT: false
+    ANTREA_TRAFFIC_ENCAP_MODE: encap
+    ANTREA_PROXY: true
+    ANTREA_ENDPOINTSLICE: false
+    ANTREA_POLICY: true
+    ANTREA_NODEPORTLOCAL: false
+    ANTREA_TRACEFLOW: true
+    ANTREA_DISABLE_UDP_TUNNEL_OFFLOAD: false
+    PROVIDER_TYPE: aws
+    TKG_CLUSTER_ROLE: workload
+    TKG_VERSION: v1.5.3-tf-v0.11.4
+    CNI: antrea
+type: addons.cluster.x-k8s.io/resource-set

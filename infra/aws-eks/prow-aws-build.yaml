@@ -1,0 +1,33 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: prow-aws-build
+  region: us-west-1
+
+vpc:
+  id: "vpc-0f48757c1f3e07870"
+  clusterEndpoints:
+    publicAccess:  true
+    privateAccess: true
+  publicAccessCIDRs: ["75.190.40.0/24"]
+  subnets:
+    private:
+      us-west-1a: { id: subnet-0774b937c5ce8043f }
+      us-west-1c: { id: subnet-06872c33beb0e2d31 }
+    public:
+      us-west-1a: { id: subnet-0ba0eb8490418014e }
+      us-west-1c: { id: subnet-0fb8aee3cf4b97c9a }
+
+managedNodeGroups:
+  - name: ng-1-workers
+    labels: { role: worker }
+    tags:
+      nodegroup-role: worker
+    instanceType: m5.large
+    desiredCapacity: 2
+    minSize: 2
+    maxSize: 12
+    privateNetworking: true
+    ssh: # use existing EC2 key
+      publicKeyName: prow-aws

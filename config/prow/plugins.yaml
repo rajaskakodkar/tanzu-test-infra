@@ -3,10 +3,12 @@
 triggers:
 - repos:
   - rajaskakodkar/tanzu-test-infra
+  - rajaskakodkar/test-prow
 
 approve:
 - repos:
   - rajaskakodkar/tanzu-test-infra
+  - rajaskakodkar/test-prow
   require_self_approval: false
 
 help:
@@ -28,6 +30,7 @@ size:
 lgtm:
 - repos:
   - rajaskakodkar/tanzu-test-infra
+  - rajaskakodkar/test-prow
   review_acts_as_lgtm: true
 
 cat:
@@ -57,6 +60,7 @@ config_updater:
 welcome:
 - repos:
   - tanzu-test-infra
+  - test-prow
   message_template: "Welcome @{{.AuthorLogin}}! <br><br>It looks like this is your first PR to <a href='https://github.com/{{.Org}}/{{.Repo}}'>{{.Org}}/{{.Repo}}</a> 🎉. You will be prompted by a bot to use commands during the review process. Do not be afraid to follow the prompts! It is okay to experiment."
 
 retitle:
