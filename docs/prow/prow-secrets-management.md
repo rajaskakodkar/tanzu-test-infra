@@ -2,112 +2,138 @@
 
 ## Overview
 
-Some jobs require using sensitive data. Encrypt the data using Key Management Service (KMS) and store it in Google Cloud Storage (GCS).
-This document shows the commands necessary to create a service account and store its encrypted key in a GCS bucket.
+The vmware-tanzu Prow project makes use of the External Secrets Operator (ESO) to synchronize secrets located in Google Secret Manager with Kubernetes secrets.  GKE allows Kubernetes service accounts to be mapped to Google service accounts.  ESO uses a Kubernetes service account to gain permissions to read secrets in the Google Secret Manager.
 
->**NOTE:** This document assumes that you are logged in to the Google Cloud project with administrative rights.
+External-secrets runs within the Kubernetes cluster as a deployment resource. It utilizes CustomResourceDefinitions to configure access to secret providers through SecretStore resources and manages Kubernetes secret resources with ExternalSecret resources.
+
+Referenced from: https://external-secrets.io/
 
 ## Prerequisites
 
- - [gcloud](https://cloud.google.com/sdk/gcloud/) to communicate with Google Cloud Platform (GCP)
- - Basic knowledge of [GCP key rings and keys](https://cloud.google.com/kms/docs/creating-keys)
-
-Use the `export {VARIABLE}={value}` command to set up these variables, where:
- - **PROJECT** is a Google Cloud project.
- - **BUCKET_NAME** is a GCS bucket in the Google Cloud project that stores Prow Secrets
- - **KEYRING_NAME** is the KMS key ring.
- - **ENCRYPTION_KEY_NAME** is the key name in the key ring that is used for data encryption.
- - **LOCATION** is the geographical location of the data center that handles requests for Cloud KMS regarding a given resource and stores the corresponding cryptographic keys. When set to `global`, your Cloud KMS resources are available from multiple data centres.
+ - Kubernetes cluster (> 1.16.0)
+ - Access to the Google project Secret manager
+ - Admin access to the prow-service and prow-gke-build clusters
 
 ## Secrets management
-
->**NOTE:** Before you follow this guide, check Prow Secrets setup for the Google Cloud project.
 
 When you communicate for the first time with Google Cloud, set the context to your Google Cloud project. Run this command:
 ```
 gcloud config set project $PROJECT
 ```
 
-### Create a GCS bucket
+### Add secrets to Google Secret Manager
 
-The purpose of the bucket is to store encrypted credentials necessary for Prow jobs like provisioning clusters or virtual machines.
-Run this command to create a bucket:
+Add each secret to Secret Manager.  Google Secret Manager is not multi-key like AWS Secrets Manager so each secret will only contain one value.  ESO has the ability to build a multi key Kubernetes secret by attaching multiple Google Secret Manager secrets.
+
+### Create Google Service Accounts needed for ESO
+
+Use this command to create the Google service accounts - one for each cluster.
 ```
-gsutil mb -p $PROJECT gs://$BUCKET_NAME/
+# create secrets service accounts
+gcloud iam service-accounts create prow-service-secrets \
+    --project=prow-tkg-build
+
+gcloud iam service-accounts create prow-build-secrets \
+    --project=prow-tkg-build
 ```
 
-### Create a key ring
-
-Use this command to create a key ring for the private keys:
+Bind the Google service account to the secrets.  The following example should be replicated for all service accounts / secrets:
 
 ```
-gcloud kms keyrings create $KEYRING_NAME --location $LOCATION
+gcloud secrets add-iam-policy-binding gcs-publisher \
+    --member="serviceAccount:prow-build-secrets@prow-tkg-build.iam.gserviceaccount.com" \
+    --role="roles/secretmanager.secretAccessor"
 ```
-### Create a key in the key ring
 
-Create a key to encrypt your private key.
+Add required roles to the Google service accounts:
+```
+# add roles to GSA
+gcloud projects add-iam-policy-binding prow-open-btr \
+    --member "serviceAccount:prow-service-secrets@prow-tkg-build.iam.gserviceaccount.com" \
+    --role roles/secretmanager.secretAccessor
+
+gcloud projects add-iam-policy-binding prow-open-btr \
+    --member "serviceAccount:prow-service-secrets@prow-tkg-build.iam.gserviceaccount.com" \
+    --role roles/iam.serviceAccountTokenCreator
+```
+
+### Create the Kubernetes service account
+
+Repeat for the service account for each build cluster.  Note the namespace/service in the binding command.
 
 ```
-gcloud kms keys create $ENCRYPTION_KEY_NAME --location $LOCATION \
-  --keyring $KEYRING_NAME --purpose encryption
+kubectl create serviceaccount prow-service-secrets-sa \
+    --namespace prow
+
+# bind KSA to GSA
+gcloud iam service-accounts add-iam-policy-binding prow-service-secrets@prow-tkg-build.iam.gserviceaccount.com \
+    --role roles/iam.workloadIdentityUser \
+    --member "serviceAccount:prow-tkg-build.svc.id.goog[prow/prow-service-secrets-sa]"
+
+# annotate KSA
+kubectl annotate serviceaccount prow-service-secrets-sa \
+    --namespace prow \
+    iam.gke.io/gcp-service-account=prow-service-secrets@prow-tkg-build.iam.gserviceaccount.com
   ```
 
-### Create a Google service account
+### Install External Secrets Operator
 
-Follow these steps:
-
-1. Export the variables, where:
-   - **SA_NAME** is the name of the service account.
-   - **SA_DISPLAY_NAME** is the display name of the service account.
-   - **SECRET_FILE** is the path to the private key.
-   - **ROLE** is the role bound to the service account.
-
-   See an example of variables you must export for such an account:
+Use helm to install ESO into its own namespace:
 
    ```
-   export SA_NAME=sa-gcs-plank
-   export SA_DISPLAY_NAME=sa-gcs-plank
-   export SECRET_FILE=sa-gcs-plank
-   export ROLE=roles/storage.objectAdmin
-
+   helm repo add external-secrets https://charts.external-secrets.io
+   helm install external-secrets external-secrets/external-secrets -n external-secrets \
+      --set installCRDs=true --create-namespace
    ```
 
-2. Create a service account:
+### Define the Secrets Store
+
+The Secrets store tells ESO where the Google secrets are located (project and region) and which Kubernetes service account to use to access the secrets.  Create this on the prow-service cluster and repeat for each build cluster:
+
    ```
-   gcloud iam service-accounts create $SA_NAME --display-name $SA_DISPLAY_NAME
+   apiVersion: external-secrets.io/v1beta1
+   kind: ClusterSecretStore
+   metadata:
+     name: prow-service-secretstore
+   spec:
+     provider:
+       gcpsm:
+         projectID: prow-tkg-build
+         auth:
+           workloadIdentity:
+             # name of the cluster region
+             clusterLocation: us-west1
+             # name of the GKE cluster
+             clusterName: prow-service
+             # projectID of the cluster (if omitted defaults to spec.provider.gcpsm.projectID)
+             # clusterProjectID: my-cluster-project
+             # reference the sa from above
+             serviceAccountRef:
+               name: prow-service-secrets-sa
+               namespace: prow
    ```
 
-3. Create a private key for the service account:
-   ```
-   gcloud iam service-accounts keys create $SECRET_FILE --iam-account=$SA_NAME@$PROJECT.iam.gserviceaccount.com
-   ```
+### Define secrets to create in the Kubernetes namespace
 
-4. Add a policy binding to the service account:
-   ```
-   gcloud projects add-iam-policy-binding $PROJECT --member=serviceAccount:$SA_NAME@$PROJECT.iam.gserviceaccount.com --role=$ROLE
-   ```
-
-### Encrypt the Secret
-
-1. Export the **SECRET_FILE** variable which is the path to the file which contains the Secret.
-
-2. Encrypt the Secret:
-   ```
-   gcloud kms encrypt --location global --keyring $KEYRING_NAME --key $ENCRYPTION_KEY_NAME --plaintext-file $SECRET_FILE --ciphertext-file $SECRET_FILE.encrypted
-   ```
-
-### Upload the Secret
-
-Upload the encrypted Secret to GCP:
+The following example is of one secret.  Repeat example for each secret. Create this on the prow-service cluster and repeat for each build cluster:
 ```
-gsutil cp $SECRET_FILE.encrypted gs://$BUCKET_NAME/
+---
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: gcs-credentials
+spec:
+  refreshInterval: 1m
+  secretStoreRef:
+    name: prow-service-secretstore
+    kind: ClusterSecretStore
+  target:
+    name: gcs-credentials
+    creationPolicy: Owner
+  data:
+  - secretKey: "service-account.json"
+    remoteRef:
+      key: gcs-publisher
 ```
 
-### Delete the Secret
-
-Delete the private key files:
-
-```
-rm {file-name}
-rm {file-name}.encrypted
-```
+The Google Secret Manager is checked and the Kubernetes secrets updated every 10 seconds by default.
