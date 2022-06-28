@@ -17,7 +17,7 @@ periodics:
 #     preset-dind-enabled: "true"
 #   spec:
 #     containers:
-#     - image: public.ecr.aws/l3j4k1y7/vmware-tanzu/test-image:v20221003-6f693ab
+#     - image: public.ecr.aws/t0q8k6g2/vagator/test-image:v20221003-6f693ab
 #       command:
 #       - /usr/local/bin/run.sh
 #       args:
@@ -74,7 +74,7 @@ periodics:
     preset-dind-enabled: "true"
   spec:
     containers:
-    - image: public.ecr.aws/l3j4k1y7/vmware-tanzu/test-image:v20222903-be6db42
+    - image: REGISTRY_PUSH/test-image:v20222903-be6db42
       command:
       - /usr/local/bin/run.sh
       args:

@@ -1,0 +1,45 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: patch-aws-account-resources-job
+  namespace: test-pods
+spec:
+  template:
+    metadata:
+      name: patch-aws-account-resources-job 
+    spec:
+      serviceAccountName: patch-aws-account-sa
+      containers:
+      - name: patch-aws-account
+        image: bitnami/kubectl
+        command: 
+        - /bin/bash
+        - -c
+        - |
+          cat <<EOF | kubectl apply -f -
+          apiVersion: boskos.k8s.io/v1
+          kind: ResourceObject
+          metadata:
+            name: "test-boskos-aws-account"
+            namespace: "test-pods"
+          spec:
+            type: aws-account
+          status:
+            owner: ""
+            state: free
+            userData:
+              access-key-id: ${ACCESS_KEY_ID}
+              secret-access-key: ${ACCESS_KEY_SECRET}
+          EOF
+        env:
+        - name: ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: aws-access-key-id
+              key: aws-access-key-id
+        - name: ACCESS_KEY_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: aws-access-key-secret
+              key: aws-access-key-secret
+      restartPolicy: Never

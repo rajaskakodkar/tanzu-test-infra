@@ -1,0 +1,21 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: prow-aws-build
+  region: us-west-1
+vpc:
+  clusterEndpoints:
+    publicAccess:  true
+    privateAccess: true
+managedNodeGroups:
+  - name: ng-1-workers
+    labels: { role: worker }
+    tags:
+      nodegroup-role: worker
+    instanceType: m5.large
+    desiredCapacity: 2
+    minSize: 2
+    maxSize: 12
+    privateNetworking: true
+    ssh: # use existing EC2 key
+      publicKeyName: prow-aws
