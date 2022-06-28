@@ -10,7 +10,7 @@ To deploy a Prow cluster, configure the following service accounts in the GCP pr
 | **prow-build-secrets**   | Provides access to Secret Manager for ESO  | (`roles/iam.workloadIdentityUser`), (`roles/iam.serviceAccountTokenCreator`), (`roles/secretmanager.secretAccessor`)  |
 | **prow-prod-publisher**   | Saves release and development artifacts to the Artifact registry.  | (`roles/artifactregistry.writer`)  |
 | **prow-prod-artifact-writer**   | Saves release and development artifacts to the GCS bucket (proposed). | `Storage Object Admin` (`roles/storage.objectAdmin`)  |
-| **prow-prod-integration**    | Runs integration tests on Minikube (proposed). | `Compute Instance Admin (beta)` (`roles/compute.instanceAdmin`), `Compute OS Admin Login` (`roles/compute.osAdminLogin`), `Service Account User` (`roles/iam.serviceAccountUser`) |
+| **prow-prod-integration**    | Runs integration tests (proposed). | `Compute Instance Admin (beta)` (`roles/compute.instanceAdmin`), `Compute OS Admin Login` (`roles/compute.osAdminLogin`), `Service Account User` (`roles/iam.serviceAccountUser`) |
 
 
 
@@ -48,8 +48,14 @@ All users that are not members of the `vmware-tanzu` organization are considered
 
 ## Authorization decisions enforced by Prow
 
-Actions on Prow can be triggered only by webhooks. To configure them you must create two Github Secrets on your Prow cluster:
-- `hmac-token` - used to validate webhook
-- `oauth-token` - stores the access token used by the GitHub bot
+Actions on Prow can be triggered only by webhooks. To configure them you must create Github Secrets on your Prow cluster:
+  - `hmac-token` - used to validate webhook
+  - `github-token` - stores the GitHub appid and cert
 
-Follow the official [Prow documentation](https://github.com/kubernetes/test-infra/blob/master/prow/getting_started_deploy.md#create-the-github-secrets) to learn how to create the Secrets.
+A GitHub OAuth app can be used to check on PR Status and to enable the rerun button on Prow Status. If OAuth is configured, Prow will perform GitHub actions on behalf of the authenticated users. This is necessary to fetch information about pull requests for the PR Status page and to authenticate users when checking if they have permission to rerun jobs via the rerun button on Prow Status.  This requires the following secrets in the Prow service cluster:
+
+  - `cookie` - used in creating the OAuth token
+  - `github-oauth-config` - stores GitHub OAuth specifics
+
+
+Kubernetes secrets are automated in the GKE Prow clusters using External Secrets Operator which synchronizes GCP Secret Manager secrets with Kubernetes secrets.  This is documented here: [Prow Secrets Management](./prow-secrets-management.md).

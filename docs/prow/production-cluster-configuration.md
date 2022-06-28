@@ -3,7 +3,6 @@
 ## Overview
 
 This instruction provides the steps required to deploy a production cluster for Prow.
->**NOTE**: This Prow installation is compatible with the [`fbc86f22b087a29d1dcf1f695bf367bbbe73e262`](https://github.com/kubernetes/test-infra/tree/fbc86f22b087a29d1dcf1f695bf367bbbe73e262) revision in the `kubernetes/test-infra` repository, except for the branchprotector image which comes from the [`e4763975e0ab2d6a78bca446e9dfde1800d47af8`](https://github.com/kubernetes/test-infra/commit/e4763975e0ab2d6a78bca446e9dfde1800d47af8) revision in `kubernetes/test-infra`.
 
 ## Prerequisites
 
@@ -12,16 +11,14 @@ Use the following tools and configuration:
 - Kubernetes 1.10+ on Google Kubernetes Engine (GKE)
 - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/) to communicate with Kubernetes
 - [gcloud](https://cloud.google.com/sdk/gcloud/) to communicate with Google Cloud Platform (GCP)
-- The `kyma-bot` GitHub account
-- [Kubernetes cluster](./prow-installation-on-forks.md#provision-a-main-prow-cluster)
+- The `vmware-tanzu-prow-bot` GitHub account
+- [Kubernetes cluster](./prow-installation.md#provision-a-main-prow-cluster)
 - Secrets in the Kubernetes cluster:
   - `hmac-token` which is a Prow HMAC token used to validate GitHub webhooks
-  - `oauth-token` which is a GitHub token with read and write access to the `kyma-bot` account
-  - `sap-slack-bot-token` which is a token for publishing messages in the SAP CX workspace. Find more information [here](https://api.slack.com/docs/token-types#bot).
-- Two buckets on Google Cloud Storage (GCS), one for storing Secrets and the second for storing logs
+  - `oauth-token` which is a GitHub token with read and write access to the `vmware-tanzu` account
+- One bucket on Google Cloud Storage (GCS) for storing logs
 - GCP configuration that includes:
-  - A [global static IP address](https://cloud.google.com/compute/docs/ip-addresses/reserve-static-external-ip-address) with the `kyma-prow-status` name
-  - A [DNS registry](https://cloud.google.com/dns/docs/quickstart#create_a_managed_public_zone) for the `status.build.kyma-project.io` domain that points to the `kyma-prow-status` address
+  - A [global static IP address](https://cloud.google.com/compute/docs/ip-addresses/reserve-static-external-ip-address) with the `prow-static-ingress` name
 
 
 ## Installation
@@ -29,19 +26,17 @@ Use the following tools and configuration:
 1. Prepare the workload cluster:
 
   ```bash
-    export WORKLOAD_CLUSTER_NAME=kyma-prow-workload
-    export ZONE=europe-west3-a
-    export PROJECT=sap-kyma-prow
-
-    ### In GKE get KUBECONFIG for cluster kyma-prow-workload
-    gcloud container clusters get-credentials $WORKLOAD_CLUSTER_NAME --zone=$ZONE --project=$PROJECT
-
-    ./set-up-workload-cluster.sh
+    export WORKLOAD_CLUSTER_NAME=prow-gke-build
+    export ZONE=us-west1-a
+    export PROJECT=prow-tkg-build
   ```
 
-  This script performs the following steps:
-  - Creates a Cluster Role Binding to provide access to the Prow cluster. This way it enables running and monitoring jobs on the workload cluster.
-  - Creates Kubernetes Secrets resources from secrets fetched from the GCP bucket.
+    ### In GKE get KUBECONFIG for cluster prow-gke-build
+  ```bash
+    gcloud container clusters get-credentials $WORKLOAD_CLUSTER_NAME --zone=$ZONE --project=$PROJECT
+  ```
+
+    TBD
 
 2. Set the context to your Google Cloud project.
 
@@ -56,16 +51,14 @@ Use the following tools and configuration:
   Export these variables:
 
   ```bash
-    export CLUSTER_NAME=kyma-prow
-    export ZONE=europe-west3-a
-    export PROJECT=sap-kyma-prow
+  export WORKLOAD_CLUSTER_NAME=prow-gke-build
+  export ZONE=us-west1-a
+  export PROJECT=prow-tkg-build
   ```
 
    For GKE, run the following command:
 
-  ```bash
-    gcloud container clusters get-credentials $CLUSTER_NAME --zone=$ZONE --project=$PROJECT
-  ```
+   TBD
 
 4. Export this environment variable:
 
@@ -75,26 +68,20 @@ Use the following tools and configuration:
 
 5. Run the following script to create a Kubernetes Secret resource in the main Prow cluster. This way the main Prow cluster can access the workload cluster:
 
-  ```bash
-    ./create-secrets-for-workload-cluster.sh
-  ```
+  TBD
 
 >**NOTE:** Create the workload cluster first and make sure the **local** kubeconfig for the Prow admin contains the context for this cluster. Point the **current** kubeconfig to the main Prow cluster.
 
 6. Run the following script to start the installation process:
 
-  ```bash
-    ./scripts/install-prow.sh
-  ```
+  TBD
 
    The installation script performs the following steps to install Prow:
 
-   - Deploys the NGINX Ingress Controller
    - Creates a Cluster Role Binding
-   - Deploys Prow components with the `a202e595a33ac92ab503f913f2d710efabd3de21`revision
-   - Deploys the Cert Manager
+   - Deploys Prow components
+   - Creates the GKE cert-manager cert for prow.tanzu.io
    - Deploys secure Ingress
-   - Removes insecure Ingress
 
 7. Verify the installation.
 
@@ -103,8 +90,8 @@ Use the following tools and configuration:
    - Check if all Pods are up and running:
      `kubeclt get pods`
    - Check if the Deck is accessible from outside of the cluster:
-     `kubectl get ingress tls-ing`
-   - Copy the address of the `tls-ing` Ingress and open it in a browser to display the Prow status on the dashboard.
+     `kubectl get ingress prow`
+   - Copy the address of the `prow` Ingress and open it in a browser to display the Prow status on the dashboard.
 
 ## Configure Prow
 

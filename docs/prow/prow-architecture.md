@@ -17,9 +17,9 @@ Provisioning is automated where possible with bash shell scripting.  Automation 
 
 Secrets are created within a cluster using [External Secrets Operator](https://external-secrets.io/v0.5.7/).  Raw secrets are stored in the cloud provider's Secret Manager and retrieved by the External Secrets Operator which then creates Kubernetes secrets.  The External Secrets Operator is granted rights to read the cloud provider's Secret Manager via a Kubernetes Service Account that is linked to a cloud provider IAM service account.
 
-Other service accounts will be used to grant rights to test pods in build clusters to do things like write to a registry or build an E2E test bed.
+Kubernetes secrets are also used to grant rights to test pods in build clusters to do things like write to a registry or build an E2E test bed.  These are accessed by jobs using Prow presets [Prow presets](./presets.md)
 
-> **NOTE:** For more information on Secret management, read the [Prow Secret Management](./prow-secrets-management.md) document.
+> **NOTE:** For more information on Secret management, read the [Prow Secrets Management](./prow-secrets-management.md) document.
 
 ## Components
 Prow components access build server API servers using kubeconfig secrets.  The API servers are protected by firewall policies that only grant access to specific IP cidr ranges.
