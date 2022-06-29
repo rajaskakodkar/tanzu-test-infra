@@ -4,7 +4,7 @@ This document provides an overview of Prow jobs.
 
 ## Directory structure
 
-Prow jobs reside in the `prow/jobs` directory in the `test-infra` repository. Job definitions are configured in YAML files. Prow jobs can be connected to specific components or be more general, like for integration jobs. General jobs are defined directly under the `jobs/{repository_name}` directories. Jobs configured for components are available in `jobs/{repository_name}`directories which include subdirectories representing each component and containing job definitions.
+Prow jobs reside in the `prow/jobs` directory in the `tanzu-test-infra` repository. Job definitions are configured in YAML files. Prow jobs can be connected to specific components or be more general, like for integration jobs. General jobs are defined directly under the `jobs/{repository_name}` directories. Jobs configured for components are available in `jobs/{repository_name}`directories which include subdirectories representing each component and containing job definitions.
 
 
 This is a sample directory structure:
@@ -13,14 +13,17 @@ This is a sample directory structure:
 ...
 prow
 |- cluster
-| |- starter.yaml
+| |- prow apps and ingress
 |- images
 |- jobs
-| |- kyma
+| |- tanzu-test-infra
+| |- carvel
+| |- community-edition
 | | |- components
 | | | |- environments
 | | | | |- environments.yaml
-| | |- kyma.integration.yaml
+| | |- integration.yaml
+| |- pinniped
 |- scripts
 |- config.yaml
 |- plugins.yaml
@@ -37,7 +40,7 @@ You can configure the following job types:
 - **Postsubmit** jobs are almost the same as the already defined presubmit jobs, but they run when you merge the PR. You can notice the difference in labels as postsubmit jobs use **preset-build-main** instead of **preset-build-pr**.
 - **Periodic** jobs run automatically at a scheduled time. You don't need to modify or merge the PR to trigger them.
 
-The presubmit and postsubmit jobs for a PR run in a random order. Their number in a PR depends on the configuration in the YAML file. You can check the job status on [`https://status.build.kyma-project.io/`](https://status.build.kyma-project.io/).
+The presubmit and postsubmit jobs for a PR run in a random order. Their number in a PR depends on the configuration in the YAML file. You can check the job status on [`https://status.build.vmware-tanzu-project.io/`](https://status.build.vmware-tanzu-project.io/).
 
 
 ## Naming convention
@@ -47,12 +50,12 @@ When you define jobs for Prow, the **name** parameter of the job must follow one
 - `{prefix}-{repository-name}-{path-to-component}` for components
 - `{prefix}-{repository-name}` for jobs not connected to a particular component
 
-You can extend the name of the job with a suffix to indicate the job's purpose. For example, write `pre-main-kyma-integration`.
+You can extend the name of the job with a suffix to indicate the job's purpose. For example, write `pre-main-vmware-tanzu-integration`.
 
 Add `{prefix}` in front of all presubmit and postsubmit jobs. Use:
 - `pre-main` for presubmit jobs that run against the `main` branch.
 - `post-main` for postsubmit jobs that run against the `main` branch.
-- `pre-rel{release-number}` for presubmit jobs that run against the release branches. For example, write `pre-rel06-kyma-components-api-controller`.
+- `pre-rel{release-number}` for presubmit jobs that run against the release branches. For example, write `pre-rel06-vmware-tanzu-components-api-controller`.
 
 
 ## Triggers
@@ -75,9 +78,9 @@ If you want to trigger your job again, add one of these comments to your PR:
 
 `/test all` to rerun all tests
 `/retest` to only rerun failed tests
-`/test {test-name}` or `/retest {test-name}` to only rerun a specific test. For example, run `/test pre-main-kyma-components-binding-usage-controller`.
+`/test {test-name}` or `/retest {test-name}` to only rerun a specific test. For example, run `/test pre-main-vmware-tanzu-components-binding-usage-controller`.
 
-After you trigger the job, it appears on [`https://status.build.kyma-project.io/`](https://status.build.kyma-project.io/).
+After you trigger the job, it appears on [`https://status.build.vmware-tanzu-project.io/`](https://status.build.prow.tanzu.io/).
 
 
 ## Create jobs
@@ -95,15 +98,15 @@ make jobs-definitions
 ## Prow job tester
 Prow job tester (`pjtester`) is a dedicated tool for testing changes to Prow jobs and scripts in the `test-infra` repository, which are **under development**. Additionally, it can use code from pull requests (PRs) in other repositories.
 
-For example, to test a PR in the Kyma repository, create a new file `vpath/pjtester.yaml` in the `test-infra` repository.
+For example, to test a PR in the vmware-tanzu repository, create a new file `vpath/pjtester.yaml` in the `test-infra` repository.
 ```yaml
 pjNames:
   - pjName: <PROW JOB NAME>
   - pjName: ...
 prConfigs:
-  kyma-project:
-    kyma:
-      prNumber: <PR NUMBER IN KYMA REPO> 
+  vmware-tanzu-project:
+    vmware-tanzu:
+      prNumber: <PR NUMBER IN vmware-tanzu REPO>
 ```
 | Parameter name | Required | Description |
 |----------------|----------|-------------|
@@ -113,13 +116,13 @@ prConfigs:
 
 > **NOTE:** We recommend to keep PRs as draft ones until you're satisfied with the results.
 
-- For more details on how to use `pjtester`, see [the `pjtester` README](https://github.com/kyma-project/test-infra/blob/main/development/tools/cmd/pjtester/README.md)
+- For more details on how to use `pjtester`, see [the `pjtester` README](https://github.com/vmware-tanzu-project/test-infra/blob/main/development/tools/cmd/pjtester/README.md)
 document.
 - To see how to trigger Prow jobs to test, go to the aforementioned [`Interact with Prow`](./prow-jobs.md#interact-with-prow) section.
 
 
 ## Rerun jobs from UI
-All [cluster-access](https://github.com/orgs/kyma-project/teams/cluster-access) team members are authorized to rerun jobs from UI.
+All [cluster-access](https://github.com/orgs/vmware-tanzu/teams/cluster-access) team members are authorized to rerun jobs from UI.
 
 ![rerun job](./assets/rerun.png)
 
@@ -140,12 +143,12 @@ Use a tool called [mkpj](https://github.com/kubernetes/test-infra/tree/master/pr
     ```shell
     git reset <compatible commit sha> --hard
     ```
-3. See the example of generating the `kyma-gke-nightly` target:
+3. See the example of generating the `vmware-tanzu-gke-nightly` target:
 
    ```shell
-   go run prow/cmd/mkpj/main.go --job=kyma-gke-nightly --config-path="$GOPATH/src/github.com/kyma-project/test-infra/prow/config.yaml" --job-config-path="$GOPATH/src/github.com/kyma-project/test-infra/prow/jobs/" > job.yaml
+   go run prow/cmd/mkpj/main.go --job=vmware-tanzu-gke-nightly --config-path="$GOPATH/src/github.com/vmware-tanzu-project/test-infra/prow/config.yaml" --job-config-path="$GOPATH/src/github.com/vmware-tanzu-project/test-infra/prow/jobs/" > job.yaml
    ```
-   
+
 4. You can trigger this job manually. Run:
    ```shell
    kubectl apply -f job.yaml

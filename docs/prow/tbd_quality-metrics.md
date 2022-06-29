@@ -1,7 +1,7 @@
 # Quality metrics
 
-This document describes reports that provide an overview of the basic quality measures for the Kyma project.
-See [this epic](https://github.com/kyma-project/kyma/issues/5472) for more information on gathering quality metrics.
+This document describes reports that provide an overview of the basic quality measures for the vmware-tanzu project.
+See [this epic](https://github.com/vmware-tanzu-project/vmware-tanzu/issues/5472) for more information on gathering quality metrics.
 
 ## Test coverage
 
@@ -26,14 +26,14 @@ SELECT
        OVER w1 AS last_timestamp
    , NTH_VALUE(timestamp, 2)
        OVER w1 AS previous_timestamp
-   , format("https://status.build.kyma-project.io/?job=%s", k8s_pod_prow_k8s_io_job)  as link
+   , format("https://status.build.vmware-tanzu-project.io/?job=%s", k8s_pod_prow_k8s_io_job)  as link
 FROM
 (
   SELECT
       MIN(CAST(REGEXP_EXTRACT(textPayload, r"(\d{1,2})") as int64)) as val
     , labels.k8s_pod_prow_k8s_io_job as k8s_pod_prow_k8s_io_job
     , MAX(timestamp) as timestamp
-  FROM `sap-kyma-prow.total_test_coverage.stdout`
+  FROM `sap-vmware-tanzu-prow.total_test_coverage.stdout`
   GROUP BY resource.labels.pod_name, labels.k8s_pod_prow_k8s_io_job
 ) main
 where k8s_pod_prow_k8s_io_job not like 'pre%'
@@ -49,8 +49,8 @@ You can check this report [here](https://datastudio.google.com/open/1TmjzxgO8yTG
 
 ## Bugs and regression metrics
 
-[GithubStats application](https://github.com/kyma-project/test-infra/tree/main/development/tools/cmd/githubstats) 
-is used to gather data on bugs and regressions. It is executed as a [Prow job](https://status.build.kyma-project.io/?job=github-stats) once a day. The data are grabbed by Stackdriver export and forwarded to BigQuery.
+[GithubStats application](https://github.com/vmware-tanzu-project/test-infra/tree/main/development/tools/cmd/githubstats) 
+is used to gather data on bugs and regressions. It is executed as a [Prow job](https://status.build.vmware-tanzu-project.io/?job=github-stats) once a day. The data are grabbed by Stackdriver export and forwarded to BigQuery.
 A JSON object is automatically flattened into multiple columns.
 
 The Prow job creates the following output:
@@ -75,8 +75,8 @@ The Prow job creates the following output:
     }
   },
   "Type": "GithubIssuesStatsReport",
-  "Owner": "kyma-project",
-  "Repository": "kyma",
+  "Owner": "vmware-tanzu-project",
+  "Repository": "vmware-tanzu",
   "Timestamp": "2019-12-11T06:01:18.770743384Z"
 }
 ```
@@ -91,7 +91,7 @@ select
   , CAST((jsonPayload.issues.open.totalcount + jsonPayload.issues.closed.totalcount) as int64) as totalcount
   , jsonPayload.timestamp
   , CONCAT(jsonPayload.owner, "/", jsonPayload.repository) as repository
-from `sap-kyma-prow.stats_github.stdout`
+from `sap-vmware-tanzu-prow.stats_github.stdout`
 order by jsonPayload.timestamp desc
 ```
 

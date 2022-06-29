@@ -6,6 +6,7 @@ metadata:
   name: prow
   annotations:
     kubernetes.io/ingress.class: "gce"
+    kubernetes.io/ingress.allow-http: "false"
     kubernetes.io/ingress.global-static-ip-name: prow-static-ingress
     networking.gke.io/managed-certificates: managed-cert
 spec:

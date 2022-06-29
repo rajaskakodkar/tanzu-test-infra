@@ -1,6 +1,6 @@
 # Manage component jobs with templates
 
-This document describes how to define, modify, and remove Prow jobs for Kyma components using predefined templates that create both presubmit and postsubmit jobs for your component. Also, this document gives you the steps required to prepare your component for the Prow CI pipeline.
+This document describes how to define, modify, and remove Prow jobs for vmware-tanzu components using predefined templates that create both presubmit and postsubmit jobs for your component. Also, this document gives you the steps required to prepare your component for the Prow CI pipeline.
 
 <div tabs name="add-component-jobs">
   <details>
@@ -14,40 +14,40 @@ Follow these steps:
 
    Go to `templates/data/generic_component_data.yaml` and add a new entry with your component details to the `render` list under the `templates` section.
    
-   See an example that defines the `compass-runtime-agent` component from the `kyma` repository, using the generic bootstrap:
+   See an example that defines the `compass-runtime-agent` component from the `vmware-tanzu` repository, using the generic bootstrap:
 
    ```yaml
    templates:
    - from: generic.tmpl
      render:
-      - to: ../../prow/jobs/kyma/components/compass-runtime-agent/compass-runtime-agent-generic.yaml
+      - to: ../../prow/jobs/vmware-tanzu/components/compass-runtime-agent/compass-runtime-agent-generic.yaml
         jobConfigs:
-         - repoName: "github.com/kyma-project/kyma"
+         - repoName: "github.com/vmware-tanzu-project/vmware-tanzu"
            jobs:
             - jobConfig:
               path: components/compass-runtime-agent
               args:
-              - "/home/prow/go/src/github.com/kyma-project/kyma/components/compass-runtime-agent"
+              - "/home/prow/go/src/github.com/vmware-tanzu-project/vmware-tanzu/components/compass-runtime-agent"
               run_if_changed: "^components/compass-runtime-agent/|^common/makefiles/"
               release_since: "1.7"
               optional: true
            ...
    ```
 
-   Such an entry uses the `generic.tmpl` template to create the `compass-runtime-agent-generic.yaml` file under the `/prow/jobs/kyma/components/compass-runtime-agent/` subfolder, specifying that the presubmit and postsubmit jobs for this component should apply from the `1.7` release onwards.
+   Such an entry uses the `generic.tmpl` template to create the `compass-runtime-agent-generic.yaml` file under the `/prow/jobs/vmware-tanzu/components/compass-runtime-agent/` subfolder, specifying that the presubmit and postsubmit jobs for this component should apply from the `1.7` release onwards.
    Set the **optional** parameter to `true` for this job to be optional on pull requests (PRs), not to block others.
 
    If needed, you can add global Config Sets (**globalSets**) to the `templates/config.yaml` file.
 
-   For more information about creating template files, as well as local config sets (**localSets**), job configs (**jobConfig**) and (**globalSets**), read [Render Templates](https://github.com/kyma-project/test-infra/tree/main/development/tools/cmd/rendertemplates).
-   > **CAUTION:** The `.yaml` file and the component folder name should be the same as the name of the Kyma component. Also, all `.yaml` files in the whole `jobs` structure must have unique names.
+   For more information about creating template files, as well as local config sets (**localSets**), job configs (**jobConfig**) and (**globalSets**), read [Render Templates](https://github.com/vmware-tanzu-project/test-infra/tree/main/development/tools/cmd/rendertemplates).
+   > **CAUTION:** The `.yaml` file and the component folder name should be the same as the name of the vmware-tanzu component. Also, all `.yaml` files in the whole `jobs` structure must have unique names.
    
    Use the buildpack for Go or Node.js applications provided in the `test-infra` repository. It is the standard mechanism for defining Prow jobs. If the buildpack you want to use is not there yet, you must add it. When you add a new buildpack, follow the example of the already defined ones.
 
 
 2. Define a test for your component.
 
-   Add a new component test entry to the [`components_test.go`](../../development/tools/jobs/kyma/components_test.go) file for the `test-infra-test-jobs-yaml-definitions` presubmit job to execute it.
+   Add a new component test entry to the [`components_test.go`](../../development/tools/jobs/vmware-tanzu/components_test.go) file for the `test-infra-test-jobs-yaml-definitions` presubmit job to execute it.
 
    See the example:
    
@@ -67,7 +67,7 @@ Follow these steps:
    
    If you have access to a Prow cluster, you can test a Prow job on it. For details, see [Kubernetes: How to test a ProwJob](https://github.com/kubernetes/test-infra/blob/master/prow/build_test_update.md#how-to-test-a-prowjob).
    
-   When writing tests for a new component, use the `tester.GetKymaReleasesSince({next release})` function to create tests for release jobs.
+   When writing tests for a new component, use the `tester.Getvmware-tanzuReleasesSince({next release})` function to create tests for release jobs.
 
 
 3. Generate jobs.
@@ -93,7 +93,7 @@ Follow these steps:
    See an example:
 
    ```bash
-   cd $GOPATH/src/github.com/kyma-project/test-infra
+   cd $GOPATH/src/github.com/vmware-tanzu-project/test-infra
    ./development/validate-config.sh prow/plugins.yaml prow/config.yaml prow/jobs/
    ```
 
@@ -107,14 +107,14 @@ Follow these steps:
 
 6. Create a Makefile for your component.
 
-   Buildpacks need a `Makefile` defined in your component directory under the `kyma` repository. The `Makefile` must define the **ci-release** target that is executed for a PR issued against the release branch.
+   Buildpacks need a `Makefile` defined in your component directory under the `vmware-tanzu` repository. The `Makefile` must define the **ci-release** target that is executed for a PR issued against the release branch.
 
    See an example of `Makefile` for the Central Application Gateway component that already uses the generic buildpack:
 
    ```Makefile
    APP_NAME = central-application-gateway
    APP_PATH = components/$(APP_NAME)
-   BUILDPACK = eu.gcr.io/kyma-project/test-infra/buildpack-golang:v20210607-b7e95d8b
+   BUILDPACK = eu.gcr.io/vmware-tanzu-project/test-infra/buildpack-golang:v20210607-b7e95d8b
    SCRIPTS_DIR = $(realpath $(shell pwd)/../..)/common/makefiles
    
    override ENTRYPOINT = cmd/applicationgateway/
@@ -173,30 +173,30 @@ To change component job configuration, follow these steps:
    Buildpack for the API Controller changed from `go1.11` to `go.12` in release `1.5`. This is the component configuration before the buildpack change:
 
    ```yaml
-      - to: ../prow/jobs/kyma/components/api-controller/api-controller.yaml
+      - to: ../prow/jobs/vmware-tanzu/components/api-controller/api-controller.yaml
         values:
-          <<: *go_kyma_component_1_11
+          <<: *go_vmware-tanzu_component_1_11
           path: components/api-controller
    ```
 
    This is what the configuration created after the buildpack change looks like:
 
    ```yaml
-      - to: ../prow/jobs/kyma/components/api-controller/api-controller.yaml
+      - to: ../prow/jobs/vmware-tanzu/components/api-controller/api-controller.yaml
         values:
-          <<: *go_kyma_component_1_12
+          <<: *go_vmware-tanzu_component_1_12
           path: components/api-controller
           since: '1.5'
-      - to: ../prow/jobs/kyma/components/api-controller/api-controller-deprecated.yaml
+      - to: ../prow/jobs/vmware-tanzu/components/api-controller/api-controller-deprecated.yaml
         values:
-          <<: *go_kyma_component_1_11
+          <<: *go_vmware-tanzu_component_1_11
           path: components/api-controller
           until: '1.4'
    ```
 
 5. Modify tests.
 
-   Add a new entry to component [tests](../../development/tools/jobs/kyma/components_test.go) and modify the existing one to specify the release version until which the tests apply.
+   Add a new entry to component [tests](../../development/tools/jobs/vmware-tanzu/components_test.go) and modify the existing one to specify the release version until which the tests apply.
 
    See the example of the Console Backend Service:
 
@@ -216,7 +216,7 @@ To change component job configuration, follow these steps:
    },
    ```
 
-   When changing tests, use the `tester.GetKymaReleasesUntil({last release})` function in place of `tester.GetAllKymaReleases` to test older releases. Use the `tester.GetKymaReleasesSince({next release})` function to create tests for release jobs for future releases.
+   When changing tests, use the `tester.Getvmware-tanzuReleasesUntil({last release})` function in place of `tester.GetAllvmware-tanzuReleases` to test older releases. Use the `tester.Getvmware-tanzuReleasesSince({next release})` function to create tests for release jobs for future releases.
 
 </details>
 <details>
@@ -224,7 +224,7 @@ To change component job configuration, follow these steps:
 Remove component jobs
 </summary>
 
-CI pipeline in Kyma supports jobs for three last releases so plan the component job removal in advance. Before you remove your component from Prow, add the `until: '{release}'` entry to your component job definition in the `templates/config.yaml` file.
+CI pipeline in vmware-tanzu supports jobs for three last releases so plan the component job removal in advance. Before you remove your component from Prow, add the `until: '{release}'` entry to your component job definition in the `templates/config.yaml` file.
 
 For example, if you are planning to remove your component after version `1.3`, add the `until: '1.3'` entry to your component job definition and remove it only when the release 1.3 is no longer supported:
 

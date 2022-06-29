@@ -3,7 +3,7 @@
 This document provides an overview of how to quickly start working with Prow jobs.
 > **NOTE:** Please be aware that there are two kinds of Prow jobs. If you want to create a job for the component, read [Manage component jobs with templates](./manage-component-jobs-with-templates.md).
 
-1. Fork the [`test-infra`](https://github.com/kyma-project/test-infra) repository and feature a new branch.
+1. Fork the [`test-infra`](https://github.com/vmware-tanzu-project/test-infra) repository and feature a new branch.
 
 
 2. Jobs are generated from templates. To create a template, add the `<PROW JOB NAME>-data.yaml` file in the `templates/data` directory. The file should look like this:
@@ -20,7 +20,7 @@ This document provides an overview of how to quickly start working with Prow job
     
     > **NOTE:** Your template file and Prow job must have unique names.
     
-    - To learn more about **localSets**, **jobConfig** and **globalSets**, read [Render Templates](https://github.com/kyma-project/test-infra/tree/main/development/tools/cmd/rendertemplates). 
+    - To learn more about **localSets**, **jobConfig** and **globalSets**, read [Render Templates](https://github.com/vmware-tanzu-project/test-infra/tree/main/development/tools/cmd/rendertemplates). 
     - You can search for more examples of template files in the `templates/data` directory.
 
 
@@ -29,7 +29,7 @@ This document provides an overview of how to quickly start working with Prow job
     make jobs-definitions
     ```
     
-    For more details on how rendering templates works, read [Render Tamplates](https://github.com/kyma-project/test-infra/tree/main/development/tools/cmd/rendertemplates).
+    For more details on how rendering templates works, read [Render Tamplates](https://github.com/vmware-tanzu-project/test-infra/tree/main/development/tools/cmd/rendertemplates).
     
     > **CAUTION:** Do not change the generated file! Otherwise, the PR won't be merged, because the job checking the generated file will fail.
 
@@ -43,13 +43,13 @@ This document provides an overview of how to quickly start working with Prow job
     Script files (`.sh`) are stored in `prow/scripts` directory.
 
 
-5. To test PR in the Kyma repository, create a new file `vpath/pjtester.yaml` in the `test-infra` repository and reference the pipeline name (`<PROW JOB NAME>`).
+5. To test PR in the vmware-tanzu repository, create a new file `vpath/pjtester.yaml` in the `test-infra` repository and reference the pipeline name (`<PROW JOB NAME>`).
     ```yaml
     pjNames:
       - pjName: <PROW JOB NAME>
       - pjName: ...
     ```
-    For more details on how to use `pjtester`, read the [Prow Job tester](https://github.com/kyma-project/test-infra/blob/main/development/tools/cmd/pjtester/README.md) document.
+    For more details on how to use `pjtester`, read the [Prow Job tester](https://github.com/vmware-tanzu-project/test-infra/blob/main/development/tools/cmd/pjtester/README.md) document.
  
      
 6. Create a pull request (PR) to the `test-infra` repository.

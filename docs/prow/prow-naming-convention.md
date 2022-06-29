@@ -15,21 +15,20 @@ Each service account (SA) must follow the standard naming convention that looks 
 - `{FIRST_LATTER_OF_YOUR_NAME_AND_FULL_LAST_NAME}` - the prefix for private SAs, such as `hpotter`.
 Private SAs are limited to the project scope and their names only consist of two parts, the prefix and `gcp-project`.
 
-- `gcp-project`- one of these GCP project's shortcuts: `workloads`, `prow`, or `dev`.
+- `gcp-project`- one of these GCP project's names: `prow-prod`, or `prow-sandbox`.
 
-    | Project name   | Shortcut |
-    | :-----------------| :---------------- | 
-    | sap-kyma-prow-workloads | workloads|
-    | sap-kyma-prow | prow|
-    | sap-kyma-prow-neighbors-dev | dev|
+    | Project ID   | Project Name |
+    | :-----------------| :---------------- |
+    | prow-tkg-build | prow-prod |
+    | prow-open-btr | prow-sandbox |
 The examples of such private SAs are `fflinstone-prow` or `hpotter-workloads`.
-- `{APPLICATION_NAME}` - the name of the application or tool in which the SA is used, or the account purpose. For example, the names of SAs used by Prow are `prow-plank` or `prow-kyma-artifacts`, while the SA used by a job is named `job-kyma-integration`.
+- `{APPLICATION_NAME}` - the name of the application or tool in which the SA is used, or the account purpose. For example, the names of SAs used by Prow are `prow-plank` or `prow-vmware-tanzu-artifacts`, while the SA used by a job is named `job-vmware-tanzu-integration`.
 
 See these SA name examples:
 - `sa-prow-gcs-plank`
-- `sa-workloads-kyma-backup-restore`
+- `sa-workloads-vmware-tanzu-backup-restore`
 
-For short-term and test resources created in the `sap-kyma-prow-neighbors-dev` and `sap-kyma-prow-neighbors-workloads` projects it is necessary to easily identify a group of resources by adding the `commit-sha` prefix.
+For short-term and test resources created in the `sap-vmware-tanzu-prow-neighbors-dev` and `sap-vmware-tanzu-prow-neighbors-workloads` projects it is necessary to easily identify a group of resources by adding the `commit-sha` prefix.
 
 > **NOTE:** In the future, `commit-sha` will represent a commit ID from the `/test-infra` repository in which the test pipeline is triggered. The commit ID is rendered automatically while creating or merging a pull request.
 
@@ -49,14 +48,14 @@ To limit the scope of data accessible with any key version, each project must ha
 
 | KEY RING         | KEY | PROJECT NAME           |
 | ------------- |:-------------:|:-------------:|
-| kyma-prow |  kyma-prow-encryption |sap-kyma-prow |
-| prow-workloads | prow-workloads-encryption |sap-kyma-prow-workloads |
-| neighbors-dev | neighbors-de-encryption |sap-kyma-neighbors-dev | 
+| vmware-tanzu-prow |  vmware-tanzu-prow-encryption |sap-vmware-tanzu-prow |
+| prow-workloads | prow-workloads-encryption |sap-vmware-tanzu-prow-workloads |
+| neighbors-dev | neighbors-de-encryption |sap-vmware-tanzu-neighbors-dev |
 
 
 ## Storage buckets
 
 This section only refers to buckets created either on the `dev` or `workloads` project. You can find guidelines related to the production Prow instance [here](./production-cluster-configuration.md).
 
-Short-term and test buckets created in the `sap-kyma-prow-neighbors-dev` and `sap-kyma-prow-neighbors-workloads` are prefixed with `commit-sha`, just like SAs.
-The examples of such bucket names are `c177396-kyma-dev-logs` and `c177396-kyma-dev-secrets`.
+Short-term and test buckets created in the `sap-vmware-tanzu-prow-neighbors-dev` and `sap-vmware-tanzu-prow-neighbors-workloads` are prefixed with `commit-sha`, just like SAs.
+The examples of such bucket names are `c177396-vmware-tanzu-dev-logs` and `c177396-vmware-tanzu-dev-secrets`.
