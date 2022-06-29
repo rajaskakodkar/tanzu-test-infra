@@ -2,9 +2,9 @@
 
 The document outlines Prow architecture and interconnections between different systems and components that are involved in it.
 
-The primary Prow clusters (prow-service and prow-build) are Kubernetes instance managed by Google Kubernetes Engine (GKE) as part of the Google Cloud Platform (GCP) project called `prow-tkg-build`.  The clusters are private clusters built with Autopilot.
+The primary Prow clusters (prow-service and prow-gke-build) are Kubernetes instance managed by Google Kubernetes Engine (GKE) as part of the Google Cloud Platform (GCP) project called `prow-tkg-build`.  The clusters are private clusters built with Autopilot.
 
-There also will be Prow build clusters in various clouds: AWS, vSphere, and Azure.  TCE in AWS is the first non-GKE build cluster to be created.  This cluster will be used for TCE on AWS E2E testing.
+There also will be Prow build clusters as needed in various clouds: AWS, vSphere, and Azure.  EKS in AWS is the first non-GKE build cluster to be created.  This cluster will be used for TCE on AWS E2E testing.
 
 Most Prow Jobs will be run within build clusters separate from the Prow service cluster (the cluster where the Prow components live). Any 'trusted' jobs that require secrets or services that should not be exposed to presubmit jobs, such as publishing or deployment jobs, should run in a different cluster from the rest of the 'untrusted' jobs. The Prow service cluster will be reused as a build cluster for these 'trusted' jobs since they are typically fast and few in number.
 
@@ -13,22 +13,22 @@ See an overview of the Prow production clusters, their components, and interacti
 ![Prow architecture overview](./assets/prow-design.jpg)
 
 ## Provisioning and Secrets
-Provisioning is automated where possible with bash shell scripting.  Automation is an ongoing task and improved continually.  For each cloud environment, we have guides that outline the processes and procedures for creating the Prow environment.
+Provisioning is automated where possible with scripting.  Automation is an ongoing task and improved continually.  For each cloud environment, we have guides that outline the processes and procedures for creating the Prow environment.
 
-Secrets are created within a cluster using [External Secrets Operator](https://external-secrets.io/v0.5.7/).  Raw secrets are stored in the cloud provider's Secret Manager and retrieved by the External Secrets Operator which then creates Kubernetes secrets.  The External Secrets Operator is granted rights to read the cloud provider's Secret Manager via a Kubernetes Service Account that is linked to a cloud provider IAM service account.
+For both GKE and EKS, secrets are created within a cluster using [External Secrets Operator](https://external-secrets.io/).  Raw secrets are stored in the cloud provider's Secret Manager and retrieved by the External Secrets Operator which then creates Kubernetes secrets.  The External Secrets Operator is granted rights to read the cloud provider's Secret Manager via a Kubernetes Service Account that is linked to a cloud provider IAM service account.
 
 Kubernetes secrets are also used to grant rights to test pods in build clusters to do things like write to a registry or build an E2E test bed.  These are accessed by jobs using Prow presets [Prow presets](./presets.md)
 
 > **NOTE:** For more information on Secret management, read the [Prow Secrets Management](./prow-secrets-management.md) document.
 
 ## Components
-Prow components access build server API servers using kubeconfig secrets.  The API servers are protected by firewall policies that only grant access to specific IP cidr ranges.
+Prow components access build servers using kubeconfig files that are stored in a secret.  Each build cluster's API Server endpoint is protected by a firewall policy that only grants access to specific IP CIDR ranges.
 
 ### Crier
 Crier takes care of reporting the status of Prow job to the external services like GitHub and Slack. For more information, read [crier.md](./crier.md).
 
 ### Deck
-Deck is exposed through an Ingress definition which has TLS enabled using a certificate issued for `prow.tanzu.io`. Deck serves a UI that you can access as an anonymous user to view build statuses. Deck can only view and list the jobs and the job logs.
+Deck is exposed through an Ingress definition which has TLS enabled using a certificate issued for `prow.tanzu.io`.  The path for Deck is: `https://prow.tanzu.io/`. Deck serves a UI that you can access as an anonymous user to view build statuses. Deck can only view and list the jobs and the job logs.
 
 ### Hook
 Hook is exposed through the same Ingress as Deck using a different path which is `https://prow.tanzu.io/hook`. It listens for GitHub events triggered by the external GitHub system. The external address to the Hook component gets configured in GitHub as a webhook using a token as a Secret. That token gets generated during the provisioning process and is configured for the Hook component. Hook calls the installed plugins on receiving a GitHub event.

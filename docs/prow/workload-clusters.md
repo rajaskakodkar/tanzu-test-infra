@@ -1,6 +1,6 @@
 # Prow Workload Clusters
 
-This document describes workload clusters on which Prow schedules Pods to execute the logic of a given Prow job. All workload clusters are aggregated under the `kyma-prow` GCP project. We use two workload clusters for trusted and untrusted Prow jobs.
+This document describes workload clusters on which Prow schedules Pods to execute the logic of a given Prow job. All workload clusters are aggregated under the `vmware-tanzu-prow` GCP project. We use two workload clusters for trusted and untrusted Prow jobs.
 
 ## Clusters design
 
@@ -14,8 +14,8 @@ Workload clusters:
 
 ```gcloud container clusters list
    NAME                          LOCATION        MASTER_VERSION  MASTER_IP       MACHINE_TYPE   NODE_VERSION    NUM_NODES  STATUS
-   trusted-workload-kyma-prow    europe-west3    1.14.10-gke.36  _____________   n1-standard-4  1.14.10-gke.36  3          RUNNING
-   untrusted-workload-kyma-prow  europe-west3    1.14.10-gke.36  _____________   n1-standard-4  1.14.10-gke.36  2          RUNNING
+   trusted-workload-vmware-tanzu-prow    europe-west3    1.14.10-gke.36  _____________   n1-standard-4  1.14.10-gke.36  3          RUNNING
+   untrusted-workload-vmware-tanzu-prow  europe-west3    1.14.10-gke.36  _____________   n1-standard-4  1.14.10-gke.36  2          RUNNING
 ```
 
 ## Infrastructure design
@@ -27,23 +27,23 @@ Each cluster has a dedicated Cloud Router with Cloud NAT and an external IP addr
 ```
 gcloud compute networks list
 NAME                 SUBNET_MODE  BGP_ROUTING_MODE  IPV4_RANGE  GATEWAY_IPV4
-trusted-kyma-prow    CUSTOM       GLOBAL
-untrusted-kyma-prow  CUSTOM       GLOBAL
+trusted-vmware-tanzu-prow    CUSTOM       GLOBAL
+untrusted-vmware-tanzu-prow  CUSTOM       GLOBAL
 
 gcloud compute networks subnets list
 NAME                          REGION                   NETWORK              RANGE
-trusted-workload-kyma-prow    europe-west3             trusted-kyma-prow    
-untrusted-workload-kyma-prow  europe-west3             untrusted-kyma-prow  
+trusted-workload-vmware-tanzu-prow    europe-west3             trusted-vmware-tanzu-prow    
+untrusted-workload-vmware-tanzu-prow  europe-west3             untrusted-vmware-tanzu-prow  
 
 gcloud compute routers list
 NAME                          REGION        NETWORK
-trusted-workload-kyma-prow    europe-west3  trusted-kyma-prow
-untrusted-workload-kyma-prow  europe-west3  untrusted-kyma-prow
+trusted-workload-vmware-tanzu-prow    europe-west3  trusted-vmware-tanzu-prow
+untrusted-workload-vmware-tanzu-prow  europe-west3  untrusted-vmware-tanzu-prow
 
 gcloud compute addresses list
 NAME                          ADDRESS/RANGE   TYPE      PURPOSE  NETWORK  REGION        SUBNET  STATUS
-trusted-workload-kyma-prow    _____________   EXTERNAL                    europe-west3          IN_USE
-untrusted-workload-kyma-prow  _____________   EXTERNAL                    europe-west3          IN_USE
+trusted-workload-vmware-tanzu-prow    _____________   EXTERNAL                    europe-west3          IN_USE
+untrusted-workload-vmware-tanzu-prow  _____________   EXTERNAL                    europe-west3          IN_USE
 ```
 ## Prow design
 

@@ -76,14 +76,14 @@ For the purpose of the installation, you must have a set of service accounts and
 
 2. Create the following service accounts, role bindings, and private keys. Encrypt them using Key Management Service (KMS), and upload them to your Secret storage bucket:
 
- - **sa-gke-kyma-integration** with roles that allow the account to manage Kubernetes clusters and their resources.
- - **sa-vm-kyma-integration** with roles that allow the account to provision virtual machines.
+ - **sa-gke-vmware-tanzu-integration** with roles that allow the account to manage Kubernetes clusters and their resources.
+ - **sa-vm-vmware-tanzu-integration** with roles that allow the account to provision virtual machines.
  - **sa-gcs-plank** with the role that allows the account to store objects in a bucket.
- - **sa-gcr-push-kyma-project** with the role that allows the account to push images to Google Container Repository in the `kyma-project` GCP project.
- - **kyma-bot-npm-token** which is a token for publishing npm packages.
+ - **sa-gcr-push-vmware-tanzu-project** with the role that allows the account to push images to Google Container Repository in the `vmware-tanzu-project` GCP project.
+ - **vmware-tanzu-bot-npm-token** which is a token for publishing npm packages.
  - **sap-slack-bot-token** which is a token for publishing messages to the SAP CX workspace. Find more information [here](https://api.slack.com/docs/token-types#bot).
- - **sa-kyma-artifacts** service account with the role that allows the account to store objects in a bucket.
- - **sa-kyma-backup-restore** service account with the role that allows the account to store objects in the bucket used for backup and restore tests.
+ - **sa-vmware-tanzu-artifacts** service account with the role that allows the account to store objects in a bucket.
+ - **sa-vmware-tanzu-backup-restore** service account with the role that allows the account to store objects in the bucket used for backup and restore tests.
 
 3. Create a Secret for the workload cluster in the main Prow cluster:
 
@@ -161,7 +161,7 @@ For more details, see the [Kubernetes documentation](https://github.com/kubernet
 
 ### The plugins.yaml file
 
-The `plugins.yaml` file contains the list of [plugins](https://status.build.kyma-project.io/plugins) you enable on a given repository. See the example of such a file [here](../../prow/plugins.yaml).
+The `plugins.yaml` file contains the list of [plugins](https://status.build.vmware-tanzu-project.io/plugins) you enable on a given repository. See the example of such a file [here](../../prow/plugins.yaml).
 
 ### The job configuration file
 
