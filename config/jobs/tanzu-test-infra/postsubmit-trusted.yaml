@@ -27,35 +27,34 @@ postsubmits:
         secret:
           secretName: kubeconfig
 #
-periodics:
-- cron: "*/15 * * * 1-5"  # Bump don't label `skip-review`. Run at :15 past every hour Mon-Fri
-  name: periodic-infra-autobump-prow
-  cluster: prow-service-trusted
-  decorate: true
-  extra_refs:
-  - org: rajaskakodkar
-    repo: tanzu-test-infra
-    base_ref: main
-  spec:
-    containers:
-    - image: gcr.io/k8s-prow/generic-autobumper:v20220331-c4e1c201d5
-      command:
-      - generic-autobumper
-      args:
-      - --config=config/prow/autobump-config/prow-component-autobump-config.yaml
-      volumeMounts:
-      - name: github-token
-        mountPath: /etc/github-token
-        readOnly: true
-#      - name: ssh
-#        mountPath: /root/.ssh
-    volumes:
-    - name: github-token
-      secret:
-        secretName: github-token
-#  annotations:
-#    testgrid-dashboards: sig-testing-prow
-#    testgrid-tab-name: autobump-prow
-#    description: runs autobumper to create/update a PR that bumps prow to the latest RC without label 'skip-review'
-#    testgrid-alert-email: k8s-infra-oncall@google.com
-#    testgrid-num-failures-to-alert: '3'
+#periodics:
+#- cron: "*/15 * * * 1-5"  # Bump don't label `skip-review`. Run at :15 past every hour Mon-Fri
+#  name: periodic-infra-autobump-prow
+#  cluster: prow-service-trusted
+#  decorate: true
+#  extra_refs:
+#  - org: rajaskakodkar
+#    repo: tanzu-test-infra
+#    base_ref: main
+#  spec:
+#    containers:
+#    - image: gcr.io/k8s-prow/generic-autobumper:v20220331-c4e1c201d5
+#      command:
+#      - generic-autobumper
+#      args:
+#      - --config=config/prow/autobump-config/prow-component-autobump-config.yaml
+#      volumeMounts:
+#      - name: github-token
+#        mountPath: /etc/github-token
+#        readOnly: true
+##      - name: ssh
+##        mountPath: /root/.ssh
+#    volumes:
+#    - name: github-token
+#      secret:
+#        secretName: github-token
+##  annotations:
+##    testgrid-dashboards: sig-testing-prow
+##    testgrid-tab-name: autobump-prow
+##    testgrid-alert-email: k8s-infra-oncall@google.com
+##    testgrid-num-failures-to-alert: '3'

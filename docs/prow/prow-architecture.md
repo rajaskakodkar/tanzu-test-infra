@@ -4,7 +4,7 @@ The document outlines Prow architecture and interconnections between different s
 
 The primary Prow clusters (prow-service and prow-gke-build) are Kubernetes instance managed by Google Kubernetes Engine (GKE) as part of the Google Cloud Platform (GCP) project called `prow-tkg-build`.  The clusters are private clusters built with Autopilot.
 
-There also will be Prow build clusters as needed in various clouds: AWS, vSphere, and Azure.  EKS in AWS is the first non-GKE build cluster to be created.  This cluster will be used for TCE on AWS E2E testing.
+There also will be Prow build clusters as needed in various clouds: AWS, vSphere, and Azure.  EKS in AWS is the first non-GKE build cluster to be created.  This cluster is named `prow-eks-build` and will be used for TCE on AWS E2E testing.
 
 Most Prow Jobs will be run within build clusters separate from the Prow service cluster (the cluster where the Prow components live). Any 'trusted' jobs that require secrets or services that should not be exposed to presubmit jobs, such as publishing or deployment jobs, should run in a different cluster from the rest of the 'untrusted' jobs. The Prow service cluster will be reused as a build cluster for these 'trusted' jobs since they are typically fast and few in number.
 
@@ -22,7 +22,7 @@ Kubernetes secrets are also used to grant rights to test pods in build clusters 
 > **NOTE:** For more information on Secret management, read the [Prow Secrets Management](./prow-secrets-management.md) document.
 
 ## Components
-Prow components access build servers using kubeconfig files that are stored in a secret.  Each build cluster's API Server endpoint is protected by a firewall policy that only grants access to specific IP CIDR ranges.
+Prow components access build servers using kubeconfig files that are stored in a secret.  Each build cluster's API Server endpoint is protected by a firewall policy that only grants access to specific IP CIDR ranges (Prow service cluster and Administrator desktops).
 
 ### Crier
 Crier takes care of reporting the status of Prow job to the external services like GitHub and Slack. For more information, read [crier.md](./crier.md).
