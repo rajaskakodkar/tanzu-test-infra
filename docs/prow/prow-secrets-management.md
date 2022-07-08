@@ -2,7 +2,7 @@
 
 ## Overview
 
-The vmware-tanzu Prow project makes use of the External Secrets Operator (ESO) to synchronize secrets located in a cloud secret manager with Kubernetes secrets.  Both GKE and EKS allow Kubernetes service accounts to be mapped to cloud service accounts.  ESO uses a Kubernetes service account to gain permissions to read secrets in the cloud secret manager.
+The vmware-tanzu Prow project makes use of the External Secrets Operator (ESO) to synchronize secrets located in a cloud secret manager with Kubernetes secrets.  Both GKE and EKS allow Kubernetes service accounts to be mapped to cloud service accounts using cloud provided pod identity.  ESO uses a Kubernetes service account to gain permissions to read secrets in the cloud secret manager.
 
 External-secrets runs within the Kubernetes cluster as a deployment resource. It utilizes CustomResourceDefinitions to configure access to secret providers through SecretStore resources and manages Kubernetes secret resources with ExternalSecret resources.
 
