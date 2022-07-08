@@ -91,6 +91,10 @@ gcloud secrets add-iam-policy-binding hmac-token \
     --member="serviceAccount:prow-service-secrets@prow-open-btr.iam.gserviceaccount.com" \
     --role="roles/secretmanager.secretAccessor"
 
+gcloud secrets add-iam-policy-binding kubeconfig \
+    --member="serviceAccount:prow-service-secrets@prow-open-btr.iam.gserviceaccount.com" \
+    --role="roles/secretmanager.secretAccessor"
+
 
 # create service account
 kubectl create ns prow

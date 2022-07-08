@@ -4,7 +4,7 @@
 ## Overview
 
 This document lists all types of Secrets used in the `prow-service`, `prow-gke-build`, and `prow-eks-build` clusters, where all Prow Jobs are executed.
->**NOTE:** All Secrets are stored in the Google Secret Manager and synched to a namespace secret using External Secret Operator.
+>**NOTE:** All Secrets are stored in the cloud Secret Manager (Google Secret Manager or AWS Secrets Manager) and synched to a namespace secret using External Secret Operator.
 
 
 ## prow-service cluster

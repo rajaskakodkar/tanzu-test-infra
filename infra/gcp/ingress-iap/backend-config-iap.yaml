@@ -1,0 +1,10 @@
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: backend-config-iap
+  namespace: prow
+spec:
+  iap:
+    enabled: true
+    oauthclientCredentials:
+      secretName: iap-secret

@@ -2,7 +2,7 @@
 
 The document outlines Prow architecture and interconnections between different systems and components that are involved in it.
 
-The primary Prow clusters (prow-service and prow-gke-build) are Kubernetes instance managed by Google Kubernetes Engine (GKE) as part of the Google Cloud Platform (GCP) project called `prow-tkg-build`.  The clusters are private clusters built with Autopilot.
+The primary Prow clusters (prow-service and prow-gke-build) are Kubernetes instances managed by Google Kubernetes Engine (GKE) as part of the Google Cloud Platform (GCP) project called `prow-tkg-build`.  The clusters are private clusters built with Autopilot.
 
 There also will be Prow build clusters as needed in various clouds: AWS, vSphere, and Azure.  EKS in AWS is the first non-GKE build cluster to be created.  This cluster is named `prow-eks-build` and will be used for TCE on AWS E2E testing.
 

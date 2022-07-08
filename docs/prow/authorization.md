@@ -59,3 +59,7 @@ TBD - describe vmware-tanzu-prow-bot.  This requires a Personal Access Token (PA
 
 
 Kubernetes secrets are automated in the GKE Prow clusters using External Secrets Operator which synchronizes GCP Secret Manager secrets with Kubernetes secrets.  This is documented here: [Prow Secrets Management](./prow-secrets-management.md).
+
+## Prow website Authentication
+
+Access to the `prow.tanzu.io` website is provided by Google Identity Aware Proxy (IAP).  IAP is integrated with the GKE Ingress and has been configured to only allow access to members of the `vmware.com` Google Workspace domain.

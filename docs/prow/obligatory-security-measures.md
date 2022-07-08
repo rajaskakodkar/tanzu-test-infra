@@ -26,4 +26,7 @@ Change all Secrets that were valid when the person was a project member. Follow 
 
 ### Cluster API Server access
 
-Cluster access to the API Server via the kubectl CLI is restricted to an IP access list.  Even if you have sufficient rights in the GCP project, you will need to add your client IP CIDR to the cluster's access list.
+Cluster access to the API Server via the kubectl CLI is restricted to an IP access list.  Even if you have sufficient rights in the GCP project, you will need to add your client IP CIDR to the cluster's "authorized networks" list.
+
+## Prow website Security
+The `prow.tanzu.io` website is tied to the Kubernetes Ingress for Deck (this is what displays job details), and for Hook (the webhook interface for GitHub).  Ingress is provided by Google Cloud Ingress and is encrypted by Google Cloud's Managed Certificate Service.  Non-SSL ingress (http://prow.tanzu.io) has been disabled.
